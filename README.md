@@ -25,11 +25,12 @@ Link live (sau khi bật Pages): https://genvops.github.io/vietnam-5d-xuyen-viet
 Thêm Browser Source với link live trên, đặt 1080×1920 (dọc) hoặc 1920×1080 (ngang). Nhân vật là hình minh họa phong cách Việt, không dùng ảnh người thật không rõ nguồn.
 
 ## Game Hội An + TikTok LIVE thật (hoian.html + server.js)
-GitHub Pages là web tĩnh, KHÔNG chạy được server TikTok. Muốn live thật, chạy riêng:
+Từ 2026-11-03, theo lệnh của Sếp, hoian.html đã THAY HOÀN TOÀN bằng bản GTA HỘI AN 5D do Sếp gửi (Three.js 0.160, thuyền hộp, HUD GTA, minimap, bản đồ VN vàng). Bản cũ y ảnh / hoa sen / góc "Xem như ảnh" (commit 62dbb16d) không còn trên Pages nữa, nhưng vẫn còn trong lịch sử Git và bản sao lưu local hoian-v3-lotus-backup.html / server-full-backup.js.
+Chạy live thật:
 ```bash
 npm i
-TIKTOK_USERNAME=hoian.5d node server.js
-# mở http://localhost:3000  (game), bấm "Bắt đầu Live" ở khung góc trái trên
+# thay USERNAME trong server.js thành @TikTok của Sếp, rồi:
+node server.js
+# mở http://localhost:3000/hoian.html (game tự nối socket.io tới server)
 ```
-Không đặt username thì server vẫn chạy để test qua `/test/join?user=GenZ123`, `/test/chat`, `/test/gift`, nhưng chưa nối TikTok thật.
-Luật trong game: comment hiện bong bóng trên thuyền chính; comment "cho lên xuồng" hoặc có người JOIN live thì thêm 1 xuồng 3D vào đoàn; Hoa hồng = pháo hoa hồng + 1 bông đi dạo / 5 bông lên thuyền thả hoa đăng; Sư tử = bản đồ VN vàng phát sáng + đèn lồng đỏ bay lên; Xe = xuồng chạy nhanh x2 trong 15s. Chưa có server thì game chạy mô phỏng, số người xem lúc đó là số giả để test, không phải viewer thật.
+Lưu ý kỹ thuật: bản tiktok-live-connector mới nhất (0.9.30) không còn export TikTokLiveConnection, chỉ còn WebcastPushConnection — server.js đã sửa để dùng class có sẵn, nếu không sẽ crash ngay dòng new. Khi chưa đặt username, server vẫn chạy để game nối socket, chỉ chưa nối TikTok thật. Pages là web tĩnh, không chạy được server.js.

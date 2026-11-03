@@ -2,1130 +2,199 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Hội An Game - Phố Cổ, Chùa Cầu, Thả Hoa Đăng | Việt Nam 5D</title>
-<style>
-  *{box-sizing:border-box}
-  html,body{margin:0;height:100%;overflow:hidden;background:#16233f;font-family:Inter,system-ui,Arial,sans-serif;color:#fff}
-  #scene{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
-  .glass{background:rgba(10,14,30,.78);backdrop-filter:blur(10px);border:1px solid rgba(255,215,0,.45);border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
-  #quest{position:fixed;right:12px;top:12px;z-index:10;padding:12px 14px;width:min(320px,calc(100vw - 24px));line-height:1.6;font-size:13px}
-  #quest h2{margin:0 0 4px;font-size:15px;color:#ffe27a}
-  #quest b{color:#ffe27a}
-  #minimapWrap{position:fixed;left:12px;bottom:12px;z-index:10;text-align:center}
-  #minimap{width:168px;height:168px;border-radius:50%;border:3px solid #f5b301;box-shadow:0 0 0 3px rgba(0,0,0,.5),0 0 25px rgba(245,179,1,.5);background:#12241f;display:block}
-  #minimapWrap .n{position:absolute;left:50%;top:-2px;transform:translateX(-50%);background:#111;color:#ffe27a;font-weight:800;font-size:13px;width:22px;height:22px;line-height:22px;border-radius:50%;border:1px solid #f5b301}
-  #minimapWrap a{display:block;margin-top:6px;color:#ffe27a;font-size:12px}
-  #tiktok-live{position:fixed;left:12px;top:12px;z-index:10;padding:12px;width:280px;font-size:13px;line-height:1.55}
-  #tiktok-live h3{margin:0 0 4px;font-size:14px}
-  #tiktok-live .red{color:#ff5a5a}
-  #feed div{border-top:1px solid rgba(255,255,255,.15);padding:4px 0;overflow-wrap:anywhere}
-  #tiktok-live small{color:#ccc}
-  #tiktok-live input{width:100%;margin:4px 0;padding:9px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;font-size:13px;outline:none}
-  #tiktok-live input::placeholder{color:#ddd}
-  #vnGlow{position:fixed;inset:0;z-index:9;display:none;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(circle,rgba(255,215,0,.35),transparent 60%)}
-  #vnGlow.show{display:flex}
-  #vnGlow div{font-size:64px;font-weight:900;color:#ffe27a;text-shadow:0 0 30px #f5b301,0 0 60px #ff0}
-  #actions{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;z-index:10;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:92vw}
-  button{cursor:pointer;border:0;border-radius:999px;padding:11px 15px;font-size:13px;font-weight:700;color:#231303;background:linear-gradient(180deg,#ffe27a,#f5b301);box-shadow:0 4px 18px rgba(245,179,1,.4)}
-  button.secondary{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);box-shadow:none}
-  button.small{padding:8px 11px;font-size:12px}
-  button:active{transform:scale(.97)}
-  #toast{position:fixed;left:50%;top:36%;transform:translate(-50%,-50%) scale(.9);z-index:20;padding:16px 22px;font-size:20px;font-weight:800;text-align:center;color:#fff600;text-shadow:0 2px 12px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:all .25s}
-  #toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
-  #toast small{display:block;font-size:13px;color:#fff;font-weight:600;margin-top:4px}
-  #loading{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;background:#16233f;text-align:center;padding:20px}
-  #loading .lamp{font-size:52px;animation:floaty 1.6s ease-in-out infinite}
-  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-  #loading p{margin:0;color:#ffe27a;font-weight:700}
-  #loading span{font-size:13px;color:#ccc}
-  @media(max-width:760px){#tiktok-live{display:none}#quest{width:calc(100vw - 24px)}#minimap{width:120px;height:120px}}
-</style>
-<script>
-  setTimeout(function(){ if(!window.__hoianReady){ var el=document.getElementById('loading'); if(el){ el.innerHTML='<div class="lamp">🏮</div><p>Chưa tải được cảnh 3D</p><span>Kiểm tra mạng rồi tải lại trang. Three.js được tải từ CDN jsdelivr.</span>'; } } }, 9000);
-</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GTA HỘI AN 5D - TIKTOK LIVE</title>
+<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script type="importmap">
-{ "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
-} }
+{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}
 </script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{overflow:hidden;background:#000;color:#fff}
+#ui{position:fixed;inset:0;pointer-events:none;z-index:10}
+.top-n{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);padding:4px 20px;border-radius:10px;font-weight:bold;letter-spacing:8px}
+.live{position:absolute;top:12px;right:12px;background:rgba(20,20,20,0.9);border-radius:12px;padding:10px;width:310px;pointer-events:auto}
+.live .head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.live .head b{color:#fff;background:red;padding:2px 8px;border-radius:6px}
+.chat{font-size:12px;line-height:1.4;max-height:160px;overflow:hidden}
+.chat div{margin:4px 0}
+.minimap{position:absolute;bottom:12px;left:12px;width:210px;height:210px;border-radius:50%;border:3px solid #222;background:radial-gradient(#3a5a2a,#1a2a1a);overflow:hidden;box-shadow:0 0 20px #000}
+.minimap::after{content:'HOI AN';position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:10px;color:#ffeb3b;font-weight:bold}
+.player-dot{position:absolute;width:14px;height:10px;background:#00d0ff;clip-path:polygon(50% 0,100% 100%,0 100%);left:50%;top:60%;transform:translate(-50%,-50%) rotate(0deg)}
+.stats{position:absolute;bottom:10px;left:235px;background:rgba(0,0,0,0.7);padding:8px 12px;border-radius:10px;font-size:12px}
+.stats .bar{width:140px;height:6px;background:#333;margin:4px 0}
+.stats .bar div{height:100%;background:#4caf50;width:100%}
+.money{color:#7CFC00;font-weight:bold;font-size:16px}
+.time{position:absolute;bottom:12px;right:12px;font-size:22px;font-weight:bold;text-shadow:0 0 10px #000}
+.info{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);border:2px solid gold;color:gold;padding:10px 20px;border-radius:20px;font-size:13px;pointer-events:auto}
+.controls{position:absolute;bottom:80px;right:12px;background:rgba(0,0,0,0.6);padding:8px;border-radius:8px;font-size:10px}
+</style>
 </head>
 <body>
-<canvas id="scene"></canvas>
-
-<div id="quest" class="glass">
-  <h2>◆ Releasing Lanterns on the River</h2>
-  <div>Thả hoa sen trên sông — Phố cổ Hội An, Chùa Cầu</div>
-  <div>🌸 Hoa sen đã thả: <b id="releasedCount">0</b> &nbsp;•&nbsp; 🏮 Đèn đã thắp: <b id="lampCount">0</b>/5</div>
-  <div>🚣 Xuồng trong đoàn: <b id="boatCount">6</b> &nbsp;•&nbsp; 🎮 Chế độ: <b id="modeLabel">Xem như ảnh</b></div>
-  <div style="color:#ffe9a8">TikTok: 1 🌹 = Bạn đi dạo &nbsp;•&nbsp; 5 🌹 = lên thuyền thả hoa sen</div>
+<div id="ui">
+<div class="top-n">N</div>
+<div class="live">
+<div class="head"><b>LIVE</b> <span>👤 12.5K viewers</span></div>
+<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><img src="https://i.pravatar.cc/24" style="border-radius:50%"> <b>liveuser_hoian</b> <span style="margin-left:auto">❤️ 23.4K 🎁 23.4K</span></div>
+<div class="chat" id="chat">
+<div><span style="color:#ff6b9d">hanax._</span>: This is so beautiful omg ❤️🔥</div>
+<div><span style="color:#ffd700">explorerVN</span>: Love Hoi An at night!!!</div>
+<div><span style="color:#00e5ff">phuc_travel</span>: Send more lanterns please 🎁🎁</div>
 </div>
-
-<div id="minimapWrap">
-  <div style="position:relative"><div class="n">N</div><canvas id="minimap" width="168" height="168"></canvas></div>
-  <a href="index.html">← Về bản đồ Việt Nam 5D</a>
 </div>
-
-<div id="tiktok-live" class="glass">
-  <h3><span class="red">🔴 LIVE</span> TikTok <span id="viewers">• 642 đang xem (mô phỏng)</span></h3>
-  <div id="liveStatus">Mô phỏng • Chưa nối TikTok thật</div>
-  <input id="tiktokUser" placeholder="@TikTok của Sếp — VD: hoian.5d">
-  <input id="tiktokServer" value="http://localhost:3000" placeholder="Địa chỉ server: http://localhost:3000">
-  <button id="startLiveBtn" style="width:100%;margin:6px 0">▶ Bắt đầu Live (socket.io)</button>
-  <div id="feed"><div>🌸 Chào mừng đến phố cổ Hội An về đêm!</div></div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap">
-    <button id="gift1Btn" class="small" style="flex:1">🌹 1 bông (test)</button>
-    <button id="gift5Btn" class="small" style="flex:1">🌹 5 bông (test)</button>
-    <button id="joinTestBtn" class="small secondary" style="flex:1">➕ Join (test)</button>
-    <button id="lionTestBtn" class="small secondary" style="flex:1">🦁 Sư tử (test)</button>
-    <button id="carTestBtn" class="small secondary" style="flex:1">🚗 Xe x2 (test)</button>
-  </div>
-  <small>Pages tĩnh không chạy được server.js. Muốn live thật: chạy <b>node server.js</b> trên PC/VPS, rồi bấm Bắt đầu Live. Chưa có server thì đây là mô phỏng, số người xem là số giả để test.</small>
+<div class="minimap"><div class="player-dot" id="dot"></div></div>
+<div class="stats">
+<div>100% <span style="float:right">50%</span></div>
+<div class="bar"><div></div></div>
+<div class="money">$12,450</div>
+<div>Thu Bon River, Hoi An</div>
 </div>
-<div id="vnGlow"><div>VIỆT NAM ✦</div></div>
-
-<div id="actions">
-  <button id="releaseBtn">🌸 Thả hoa sen</button>
-  <button id="camBtn">📸 Camera: Xem như ảnh</button>
-  <button id="joinBtn" class="secondary">➕ Tham gia đoàn</button>
-  <button id="spinBtn" class="secondary">🔄 Xoay 360°: Tắt</button>
-  <button id="musicBtn" class="secondary">♪ Nhạc: Tắt</button>
+<div class="time">21:47</div>
+<div class="info" id="info">WASD lái xuồng | F lên/xuống | Chuột xoay camera | TikTok comment = thêm đoàn!</div>
+<div class="controls">🎮 GTA Controls<br>WASD Move<br>Mouse Camera<br>F Boat<br>Shift Run</div>
 </div>
-
-<div id="toast" class="glass">Chúc mừng - Hội An<small>Sông Hoài, đèn lồng, xuồng ba lá</small></div>
-<div id="loading"><div class="lamp">🏮</div><p>Đang vào phố cổ Hội An…</p><span>Kênh dọc, Chùa Cầu, thuyền, đèn lồng đang tải</span></div>
 
 <script type="module">
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { Water } from 'three/addons/objects/Water.js';
-import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-
-window.__hoianReady = true;
-const canvas = document.getElementById('scene');
-const toastEl = document.getElementById('toast');
-let toastTimer = null;
-function showToast(title, sub){
-  toastEl.innerHTML = title + (sub ? '<small>'+sub+'</small>' : '');
-  toastEl.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 3000);
-}
-
-const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.setSize(innerWidth, innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
-
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x1b2a4a);
-scene.fog = new THREE.FogExp2(0x1b2a4a, 0.0022);
-{
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environmentIntensity = 0.25;
-}
-const camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 1000);
-camera.position.set(0, 88, 98);
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 0, -40);
-controls.enableDamping = true; controls.dampingFactor = 0.06;
-controls.minDistance = 4; controls.maxDistance = 200; controls.maxPolarAngle = 1.52;
-controls.autoRotateSpeed = 0.9; controls.enabled = true;
+scene.fog = new THREE.Fog(0x0a1a2a, 80, 250);
+const camera = new THREE.PerspectiveCamera(65, innerWidth/innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
 
-scene.add(new THREE.AmbientLight(0x554433, 0.9));
-const moonLight = new THREE.DirectionalLight(0xffe9a8, 1.1);
-moonLight.position.set(60, 80, 60); moonLight.castShadow = true;
-moonLight.shadow.mapSize.set(2048, 2048);
-moonLight.shadow.camera.left = -180; moonLight.shadow.camera.right = 180;
-moonLight.shadow.camera.top = 180; moonLight.shadow.camera.bottom = -180;
-moonLight.shadow.camera.near = 10; moonLight.shadow.camera.far = 400; moonLight.shadow.bias = -0.0004;
-scene.add(moonLight);
-const warmMain = new THREE.PointLight(0xffb347, 650, 55, 1.6);
-warmMain.position.set(0, 7, 40); scene.add(warmMain);
+// Lights
+scene.add(new THREE.AmbientLight(0x332211, 0.8));
+const moon = new THREE.DirectionalLight(0xaaaaff, 1.2); moon.position.set(50,80,30); scene.add(moon);
 
-function canvasTexture(w, h, draw, rx=1, ry=1){
-  const c = document.createElement('canvas'); c.width=w; c.height=h;
-  draw(c.getContext('2d'), w, h);
-  const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry);
-  t.colorSpace = THREE.SRGBColorSpace; return t;
-}
-const wallTex = canvasTexture(512, 512, (g,w,h)=>{
-  g.fillStyle='#e6b84c'; g.fillRect(0,0,w,h);
-  for(let i=0;i<1000;i++){ g.fillStyle='rgba(120,80,20,'+(Math.random()*0.12)+')'; g.fillRect(Math.random()*w, Math.random()*h, 2+Math.random()*18, 2+Math.random()*8); }
-  for(let i=0;i<50;i++){ g.fillStyle='rgba(255,240,190,'+(Math.random()*0.10)+')'; g.fillRect(Math.random()*w, Math.random()*h, 20+Math.random()*60, 8+Math.random()*20); }
-  g.fillStyle='rgba(90,60,15,0.25)'; for(let y=0;y<h;y+=64) g.fillRect(0,y,w,2);
-});
-const roofTex = canvasTexture(512, 256, (g,w,h)=>{
-  g.fillStyle='#7e3323'; g.fillRect(0,0,w,h);
-  for(let y=0;y<h;y+=32){ for(let x=0;x<w;x+=32){
-    g.fillStyle = ((x+y)%64===0) ? '#9c4a30' : '#6d2a1e';
-    g.beginPath(); g.arc(x+16, y+16, 15, 0, Math.PI, true); g.fill();
-    g.fillStyle='rgba(0,0,0,0.22)'; g.fillRect(x, y+28, 32, 4);
-  }}
-}, 3, 1);
-const woodTex = canvasTexture(512, 256, (g,w,h)=>{
-  g.fillStyle='#6b4226'; g.fillRect(0,0,w,h);
-  for(let y=0;y<h;y+=42){ g.fillStyle='rgba(30,16,6,0.55)'; g.fillRect(0,y,w,3); g.fillStyle='rgba(255,210,150,0.14)'; g.fillRect(0,y+3,w,2); }
-  for(let i=0;i<120;i++){ g.strokeStyle='rgba(40,22,8,'+(0.1+Math.random()*0.25)+')'; g.beginPath(); const y=Math.random()*h; g.moveTo(0,y); g.bezierCurveTo(w*0.3,y+4,w*0.6,y-4,w,y); g.stroke(); }
-}, 2, 1);
-const bambooTex = canvasTexture(256, 256, (g,w,h)=>{
-  g.fillStyle='#c9a86a'; g.fillRect(0,0,w,h);
-  for(let x=0;x<w;x+=32){ g.fillStyle='rgba(90,60,20,0.5)'; g.fillRect(x,0,3,h); g.fillStyle='rgba(255,240,200,0.25)'; g.fillRect(x+6,0,8,h); }
-}, 2, 1);
-const scarfTex = canvasTexture(128, 128, (g,w,h)=>{
-  g.fillStyle='#a61e1e'; g.fillRect(0,0,w,h);
-  g.fillStyle='#fff'; for(let x=0;x<w;x+=16) g.fillRect(x,0,5,h); for(let y=0;y<h;y+=16) g.fillRect(0,y,w,5);
-}, 2, 2);
-const leafTex = canvasTexture(256, 256, (g,w,h)=>{
-  g.fillStyle='#2f7a33'; g.fillRect(0,0,w,h);
-  g.strokeStyle='rgba(220,255,200,0.35)'; for(let x=0;x<w;x+=24){ g.beginPath(); g.moveTo(x,0); g.lineTo(x+12,h); g.stroke(); }
-});
-const stoneTex = canvasTexture(512, 512, (g,w,h)=>{
-  g.fillStyle='#7a7264'; g.fillRect(0,0,w,h);
-  g.strokeStyle='rgba(40,35,28,0.6)'; g.lineWidth=3;
-  for(let y=0;y<=h;y+=64){ g.beginPath(); g.moveTo(0,y); g.lineTo(w,y); g.stroke(); }
-  for(let x=0;x<=w;x+=64){ g.beginPath(); g.moveTo(x,0); g.lineTo(x,h); g.stroke(); }
-  for(let i=0;i<400;i++){ g.fillStyle='rgba(0,0,0,'+(Math.random()*0.15)+')'; g.fillRect(Math.random()*w, Math.random()*h, 10, 10); }
-}, 8, 8);
-const glowTex = canvasTexture(128, 128, (g,w,h)=>{
-  const r=g.createRadialGradient(64,64,2,64,64,62);
-  r.addColorStop(0,'rgba(255,230,150,1)'); r.addColorStop(0.4,'rgba(255,180,60,0.55)'); r.addColorStop(1,'rgba(255,150,0,0)');
-  g.fillStyle=r; g.fillRect(0,0,w,h);
-});
-const lanternTex = canvasTexture(256, 128, (g,w,h)=>{
-  g.fillStyle='#ff3b1a'; g.fillRect(0,0,w,h);
-  for(let x=0;x<w;x+=32){ g.fillStyle='rgba(255,215,90,0.9)'; g.fillRect(x,0,10,h); g.fillStyle='rgba(0,0,0,0.18)'; g.fillRect(x+10,0,3,h); }
-});
-// Hoa sen hồng vẽ bằng canvas, nền trong suốt, nhìn từ trên cao xuống là thấy rõ cánh sen
-const lotusTex = canvasTexture(256, 256, (g,w,h)=>{
-  g.clearRect(0,0,w,h);
-  g.save(); g.translate(128,128);
-  for(let i=0;i<12;i++){
-    g.save(); g.rotate(i/12*Math.PI*2);
-    g.fillStyle=i%2?'#e85a8a':'#ff7fa8';
-    g.beginPath(); g.ellipse(0,-58,26,58,0,0,Math.PI*2); g.fill();
-    g.strokeStyle='rgba(180,40,90,0.6)'; g.lineWidth=2; g.stroke();
-    g.restore();
-  }
-  for(let i=0;i<8;i++){
-    g.save(); g.rotate(i/8*Math.PI*2+0.2);
-    g.fillStyle='#ffb3c8';
-    g.beginPath(); g.ellipse(0,-38,18,38,0,0,Math.PI*2); g.fill();
-    g.restore();
-  }
-  g.fillStyle='#ffd94a'; g.beginPath(); g.arc(0,0,20,0,Math.PI*2); g.fill();
-  g.fillStyle='#c98a1a'; g.beginPath(); g.arc(0,0,10,0,Math.PI*2); g.fill();
-  g.restore();
-});
-const faceTex = canvasTexture(256, 256, (g,w,h)=>{
-  g.clearRect(0,0,w,h);
-  g.strokeStyle='#222'; g.lineWidth=7; g.lineCap='round';
-  g.beginPath(); g.moveTo(52,78); g.quadraticCurveTo(76,62,100,78); g.stroke();
-  g.beginPath(); g.moveTo(156,78); g.quadraticCurveTo(180,62,204,78); g.stroke();
-  g.fillStyle='#1a1a1a';
-  g.beginPath(); g.ellipse(76,108,13,17,0,0,Math.PI*2); g.fill();
-  g.beginPath(); g.ellipse(180,108,13,17,0,0,Math.PI*2); g.fill();
-  g.fillStyle='#fff';
-  g.beginPath(); g.arc(81,102,4,0,Math.PI*2); g.fill();
-  g.beginPath(); g.arc(185,102,4,0,Math.PI*2); g.fill();
-  g.fillStyle='rgba(255,120,140,0.55)';
-  g.beginPath(); g.ellipse(48,150,18,11,0,0,Math.PI*2); g.fill();
-  g.beginPath(); g.ellipse(208,150,18,11,0,0,Math.PI*2); g.fill();
-  g.strokeStyle='#7a2a1a'; g.lineWidth=7;
-  g.beginPath(); g.moveTo(102,188); g.quadraticCurveTo(128,206,154,188); g.stroke();
-});
-function textSprite(text, scale=1){
-  const c=document.createElement('canvas'); c.width=256; c.height=64;
-  const g=c.getContext('2d'); g.font='bold 34px Arial'; g.textAlign='center'; g.textBaseline='middle';
-  g.fillStyle='rgba(0,0,0,0.55)'; g.fillRect(0,0,256,64); g.fillStyle='#ffe27a'; g.fillText(text,128,34);
-  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
-  const s=new THREE.Sprite(new THREE.SpriteMaterial({ map:t, transparent:true, depthWrite:false }));
-  s.scale.set(1.6*scale, 0.4*scale, 1); return s;
-}
-function signTexture(text){
-  return canvasTexture(256, 512, (g,w,h)=>{
-    g.fillStyle='#3a2410'; g.fillRect(0,0,w,h);
-    g.strokeStyle='#f5b301'; g.lineWidth=8; g.strokeRect(10,10,w-20,h-20);
-    g.fillStyle='#ffe27a'; g.font='bold 52px Arial'; g.textAlign='center';
-    const words=text.split(' ');
-    words.forEach((wd,i)=>{ g.fillText(wd, w/2, h/2 - (words.length-1)*30 + i*60); });
-  });
-}
-function shadowed(obj){ obj.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; } }); return obj; }
+// Water river
+const waterGeo = new THREE.PlaneGeometry(600,600,20,20);
+const waterMat = new THREE.MeshStandardMaterial({color:0x1a2a3a, roughness:0.2, metalness:0.6});
+const water = new THREE.Mesh(waterGeo, waterMat); water.rotation.x=-Math.PI/2; water.position.y=-2; scene.add(water);
 
-// ---------- Trời dusk + trăng ----------
-{
-  const n=500, pos=new Float32Array(n*3);
-  for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2, r=160+Math.random()*120, y=40+Math.random()*100;
-    pos[i*3]=Math.cos(a)*r; pos[i*3+1]=y; pos[i*3+2]=Math.sin(a)*r; }
-  const geo=new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
-  scene.add(new THREE.Points(geo, new THREE.PointsMaterial({ color:0xffe9a8, size:1.4, sizeAttenuation:false, transparent:true, opacity:0.8 })));
+// Boats - xuồng ba lá quanh rặng dừa
+function createBoat(x,z){
+  const g = new THREE.Group();
+  const hull = new THREE.Mesh(new THREE.BoxGeometry(12,2,4), new THREE.MeshStandardMaterial({color:0x5d4037}));
+  hull.position.y=0; g.add(hull);
+  const cabin = new THREE.Mesh(new THREE.BoxGeometry(4,1.5,3), new THREE.MeshStandardMaterial({color:0x8d6e63}));
+  cabin.position.set(0,1.2,0); g.add(cabin);
+  g.position.set(x,-0.5,z); scene.add(g); return g;
 }
-const moon = new THREE.Mesh(new THREE.SphereGeometry(6, 32, 32), new THREE.MeshBasicMaterial({ color:0xffdf80 }));
-moon.position.set(85, 65, -140); scene.add(moon);
-const moonGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map:glowTex, color:0xffd970, transparent:true, opacity:0.55, depthWrite:false }));
-moonGlow.scale.set(42,42,1); moonGlow.position.copy(moon.position); scene.add(moonGlow);
+const boats=[]; 
+boats.push(createBoat(0,0));
+for(let i=0;i<6;i++){ boats.push(createBoat((Math.random()-0.5)*100, (Math.random()-0.5)*100)); }
 
-// ---------- Kênh dọc: nước tối xanh, phản chiếu đèn ----------
-const waterNormals = new THREE.TextureLoader().load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/waternormals.jpg', t=>{ t.wrapS=t.wrapT=THREE.RepeatWrapping; });
-const water = new Water(new THREE.PlaneGeometry(44, 340), {
-  textureWidth:512, textureHeight:512, waterNormals,
-  sunDirection:new THREE.Vector3(0.5,0.6,-0.4).normalize(),
-  sunColor:0xffcc66, waterColor:0x0e2a33, distortionScale:3.0, fog: scene.fog !== undefined
-});
-water.rotation.x = -Math.PI/2; water.position.y = 0; scene.add(water);
+// Player - cặp đôi áo bà ba nâu
+const playerGroup = new THREE.Group();
+const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.6,1.4,4,8), new THREE.MeshStandardMaterial({color:0x6d4c41}));
+body.position.y=1.2; playerGroup.add(body);
+playerGroup.position.set(0,0,0); scene.add(playerGroup);
 
-// ---------- Bờ đá + vỉa hè ----------
-for(const side of [-1, 1]){
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(52, 340), new THREE.MeshStandardMaterial({ map:stoneTex, roughness:1 }));
-  ground.rotation.x=-Math.PI/2; ground.position.set(side*48, 0.12, 0); ground.receiveShadow=true; scene.add(ground);
-  const walk = new THREE.Mesh(new RoundedBoxGeometry(14, 0.5, 340, 1, 0.15), new THREE.MeshStandardMaterial({ map:stoneTex, roughness:1 }));
-  walk.position.set(side*29, 0.35, 0); walk.receiveShadow=true; scene.add(walk);
-  const edge = new THREE.Mesh(new RoundedBoxGeometry(1.2, 1.0, 340, 1, 0.2), new THREE.MeshStandardMaterial({ color:0x5a5348, roughness:1 }));
-  edge.position.set(side*22.5, 0.4, 0); scene.add(edge);
+// Map VN vàng
+const mapShape = new THREE.Shape();
+mapShape.moveTo(0,0); mapShape.lineTo(2,5); mapShape.lineTo(0,10); mapShape.lineTo(-1,5); mapShape.lineTo(0,0);
+const mapGeo = new THREE.ExtrudeGeometry(mapShape, {depth:0.2, bevelEnabled:false});
+const mapMat = new THREE.MeshBasicMaterial({color:0xffd700, transparent:true, opacity:0.9});
+const vnMap = new THREE.Mesh(mapGeo, mapMat); vnMap.position.set(-5,35,-40); vnMap.scale.set(3,3,3); scene.add(vnMap);
+
+// Houses + lanterns
+for(let i=0;i<40;i++){
+  const h = new THREE.Mesh(new THREE.BoxGeometry(6+Math.random()*4,8,6), new THREE.MeshStandardMaterial({color:0xc8a951}));
+  const angle=Math.random()*Math.PI*2; const r=60+Math.random()*80;
+  h.position.set(Math.cos(angle)*r,2,Math.sin(angle)*r); scene.add(h);
+  const lan = new THREE.Mesh(new THREE.SphereGeometry(0.6,8,8), new THREE.MeshStandardMaterial({color:0xff2200, emissive:0xff2200, emissiveIntensity:2}));
+  lan.position.set(h.position.x,6+Math.random()*4,h.position.z); scene.add(lan);
 }
 
-// ---------- Nhà phố cổ: mặt tiền quay ra kênh ----------
-function houseGeo(w, h, d, roofH){
-  const s = new THREE.Shape();
-  s.moveTo(-w/2,0); s.lineTo(w/2,0); s.lineTo(w/2,h); s.lineTo(0,h+roofH); s.lineTo(-w/2,h); s.closePath();
-  const g = new THREE.ExtrudeGeometry(s, { depth:d, bevelEnabled:true, bevelThickness:0.25, bevelSize:0.25, bevelSegments:2 });
-  g.translate(0,0,-d/2); return g;
-}
-function roofGeo(w, d, roofH){
-  const s = new THREE.Shape();
-  s.moveTo(-w/2-0.8,0); s.lineTo(w/2+0.8,0); s.lineTo(0,roofH+0.5); s.closePath();
-  const g = new THREE.ExtrudeGeometry(s, { depth:d+1.6, bevelEnabled:true, bevelThickness:0.2, bevelSize:0.2, bevelSegments:2 });
-  g.translate(0,0,-(d+1.6)/2); return g;
-}
-const shopSigns = ['HỘI AN','CÀ PHÊ','ĐÈN LỒNG','BÁNH MÌ','LỤA','GỐM'];
-function makeHouse(w,h,d, withBalcony, signText){
-  const grp = new THREE.Group();
-  const wall = new THREE.Mesh(houseGeo(w,h,d,2.4), new THREE.MeshStandardMaterial({ map:wallTex, roughness:0.9 }));
-  grp.add(wall);
-  const roof = new THREE.Mesh(roofGeo(w,d,2.4), new THREE.MeshStandardMaterial({ map:roofTex, roughness:0.95 }));
-  roof.position.y = h; grp.add(roof);
-  const eave = new THREE.Mesh(new RoundedBoxGeometry(w+1.2, 0.3, d+1.4, 2, 0.12), new THREE.MeshStandardMaterial({ map:woodTex, roughness:1 }));
-  eave.position.y = h+0.1; grp.add(eave);
-  const doorShape = new THREE.Shape();
-  doorShape.moveTo(-0.7,0); doorShape.lineTo(-0.7,1.8); doorShape.quadraticCurveTo(0,2.6,0.7,1.8); doorShape.lineTo(0.7,0); doorShape.closePath();
-  const door = new THREE.Mesh(new THREE.ExtrudeGeometry(doorShape, { depth:0.15, bevelEnabled:true, bevelThickness:0.05, bevelSize:0.05, bevelSegments:1 }), new THREE.MeshStandardMaterial({ map:woodTex, color:0x8a5a2a, roughness:0.9 }));
-  door.position.set(0, 0.35, d/2+0.15); grp.add(door);
-  for(const sx of [-w*0.28, w*0.28]){
-    const frame = new THREE.Mesh(new RoundedBoxGeometry(w*0.22, h*0.34, 0.18, 2, 0.06), new THREE.MeshStandardMaterial({ color:0xfff2cc, roughness:0.8 }));
-    frame.position.set(sx, h*0.62, d/2+0.15); grp.add(frame);
-    const win = new THREE.Mesh(new THREE.PlaneGeometry(w*0.16, h*0.26), new THREE.MeshStandardMaterial({ color:0x2a1c08, emissive:0xffb347, emissiveIntensity:0.6 }));
-    win.position.set(sx, h*0.62, d/2+0.26); grp.add(win);
+// Controls GTA style
+let keys={}; onkeydown=e=>keys[e.key.toLowerCase()]=true; onkeyup=e=>keys[e.key.toLowerCase()]=false;
+let yaw=0, pitch=0.3; let onBoat=true; let currentBoat=boats[0];
+onmousemove=e=>{ if(document.pointerLockElement){ yaw-=e.movementX*0.004; pitch=Math.max(-0.5,Math.min(1.2,pitch-e.movementY*0.004)); }};
+renderer.domElement.onclick=()=>renderer.domElement.requestPointerLock();
+
+function update(){
+  const speed = keys['shift']?0.5:0.25;
+  if(keys['w']) playerGroup.position.z-=speed*Math.cos(yaw), playerGroup.position.x-=speed*Math.sin(yaw);
+  if(keys['s']) playerGroup.position.z+=speed*Math.cos(yaw), playerGroup.position.x+=speed*Math.sin(yaw);
+  if(keys['a']) playerGroup.position.x-=speed*Math.cos(yaw), playerGroup.position.z+=speed*Math.sin(yaw);
+  if(keys['d']) playerGroup.position.x+=speed*Math.cos(yaw), playerGroup.position.z-=speed*Math.sin(yaw);
+  
+  if(onBoat && currentBoat){
+    currentBoat.position.copy(playerGroup.position);
+    currentBoat.position.y=-0.5;
   }
-  if(withBalcony){
-    const floor = new THREE.Mesh(new RoundedBoxGeometry(w*0.7, 0.25, 1.1, 2, 0.1), new THREE.MeshStandardMaterial({ map:woodTex, roughness:1 }));
-    floor.position.set(0, h*0.45, d/2+0.5); grp.add(floor);
-    const railMat = new THREE.MeshStandardMaterial({ color:0x2a1c08, roughness:0.8 });
-    for(let i=0;i<6;i++){
-      const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.9,8), railMat);
-      bar.position.set(-w*0.3 + i*w*0.12, h*0.45+0.55, d/2+1.0); grp.add(bar);
-    }
-    const topRail = new THREE.Mesh(new RoundedBoxGeometry(w*0.7, 0.08, 0.08, 1, 0.03), railMat);
-    topRail.position.set(0, h*0.45+1.0, d/2+1.0); grp.add(topRail);
-  }
-  if(signText){
-    const sign = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 2.8), new THREE.MeshStandardMaterial({ map:signTexture(signText), roughness:0.9 }));
-    sign.position.set(w*0.38, h*0.55, d/2+0.4); grp.add(sign);
-  }
-  return shadowed(grp);
-}
-for(const side of [-1, 1]){
-  let z=-150;
-  let si=0;
-  while(z < 150){
-    const w=11+Math.random()*7, h=6.5+Math.random()*3.5, d=10+Math.random()*3;
-    const hs = makeHouse(w,h,d, Math.random()<0.45, si%3===0 ? shopSigns[si%shopSigns.length] : null);
-    hs.position.set(side*41, 0.55, z + w/2);
-    hs.rotation.y = side>0 ? -Math.PI/2 : Math.PI/2;
-    scene.add(hs);
-    z += w + 2 + Math.random()*4; si++;
-  }
-}
-// Cây sau nhà
-for(let i=0;i<16;i++){
-  const side=i%2===0?-1:1;
-  const trunk=new THREE.Mesh(new THREE.CylinderGeometry(0.25,0.4,5,8), new THREE.MeshStandardMaterial({ color:0x4a3220 }));
-  trunk.position.set(side*56, 2.5, -140+i*18+Math.random()*6); trunk.castShadow=true; scene.add(trunk);
-  for(let j=0;j<3;j++){
-    const fol=new THREE.Mesh(new THREE.SphereGeometry(2.2+Math.random(), 12, 12), new THREE.MeshStandardMaterial({ color:0x1e4a26, roughness:1 }));
-    fol.position.set(side*56+(j-1)*1.2, 5.5+j*1.2, -140+i*18+Math.random()*6); fol.castShadow=true; scene.add(fol);
-  }
+  
+  const camDist=18;
+  camera.position.set(playerGroup.position.x+Math.sin(yaw)*camDist*Math.cos(pitch), playerGroup.position.y+8+Math.sin(pitch)*camDist, playerGroup.position.z+Math.cos(yaw)*camDist*Math.cos(pitch));
+  camera.lookAt(playerGroup.position.x,1.5,playerGroup.position.z);
+  
+  document.getElementById('dot').style.transform=`translate(-50%,-50%) rotate(${yaw}rad)`;
+  water.material.color.setHSL(0.6,0.3,0.1+Math.sin(Date.now()*0.001)*0.02);
 }
 
-// ---------- Chùa Cầu cuối kênh ----------
-function makeBridge(){
-  const g=new THREE.Group();
-  const stoneMat=new THREE.MeshStandardMaterial({ map:stoneTex, roughness:1 });
-  for(const px of [-20,0,20]){
-    const pier=new THREE.Mesh(new RoundedBoxGeometry(7,3.5,9,2,0.4), stoneMat);
-    pier.position.set(px,0.8,0); g.add(pier);
-  }
-  const deck=new THREE.Mesh(new RoundedBoxGeometry(76,1.2,11,2,0.3), stoneMat);
-  deck.position.y=3.2; g.add(deck);
-  for(const rz of [-4.8,4.8]){
-    const rail=new THREE.Mesh(new RoundedBoxGeometry(76,0.9,0.4,1,0.15), new THREE.MeshStandardMaterial({ map:woodTex }));
-    rail.position.set(0,4.4,rz); g.add(rail);
-  }
-  const hallMat=new THREE.MeshStandardMaterial({ map:wallTex, roughness:0.9 });
-  const hall=new THREE.Mesh(new RoundedBoxGeometry(70,3.2,7,2,0.2), hallMat);
-  hall.position.y=5.4; g.add(hall);
-  for(let x=-32;x<=32;x+=8){
-    for(const rz of [-3.2,3.2]){
-      const pil=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,3.2,10), new THREE.MeshStandardMaterial({ map:woodTex }));
-      pil.position.set(x,5.4,rz); g.add(pil);
-    }
-  }
-  // Mái chính: profile theo Z, extrude theo X
-  const roofShape=new THREE.Shape();
-  roofShape.moveTo(-6,0); roofShape.lineTo(6,0); roofShape.lineTo(0,3.2); roofShape.closePath();
-  const roofGeoB=new THREE.ExtrudeGeometry(roofShape, { depth:74, bevelEnabled:true, bevelThickness:0.2, bevelSize:0.2, bevelSegments:2 });
-  roofGeoB.translate(0,0,-37);
-  const roof=new THREE.Mesh(roofGeoB, new THREE.MeshStandardMaterial({ map:roofTex, roughness:0.95 }));
-  roof.rotation.y=Math.PI/2; roof.position.y=7.2; g.add(roof);
-  // Tháp giữa
-  const tower=new THREE.Mesh(new RoundedBoxGeometry(10,2.5,8,2,0.2), hallMat);
-  tower.position.y=8.6; g.add(tower);
-  const towerRoof=new THREE.Mesh(new THREE.ConeGeometry(7.5,4.5,4), new THREE.MeshStandardMaterial({ map:roofTex, roughness:0.95 }));
-  towerRoof.rotation.y=Math.PI/4; towerRoof.position.y=12; g.add(towerRoof);
-  const finial=new THREE.Mesh(new THREE.SphereGeometry(0.5,12,12), new THREE.MeshStandardMaterial({ color:0xffd94a, emissive:0xffb300, emissiveIntensity:0.8 }));
-  finial.position.y=14.5; g.add(finial);
-  const sign=new THREE.Mesh(new THREE.PlaneGeometry(6,2), new THREE.MeshStandardMaterial({ map:signTexture('CHÙA CẦU'), emissive:0xffb347, emissiveIntensity:0.4 }));
-  sign.position.set(0,5.6,3.9); g.add(sign);
-  for(let x=-28;x<=28;x+=14){
-    const lamp=new THREE.Mesh(new THREE.SphereGeometry(0.4,10,10), new THREE.MeshStandardMaterial({ color:0xff7a1a, emissive:0xff8a1a, emissiveIntensity:0.9 }));
-    lamp.position.set(x,6.8,4.2); g.add(lamp);
-  }
-  return shadowed(g);
-}
-const bridge=makeBridge(); bridge.position.set(0,0,-148); scene.add(bridge);
+(function animate(){ requestAnimationFrame(animate); update(); renderer.render(scene,camera); })();
 
-// ---------- Đèn lồng treo: dây ngang kênh + mái hiên, đung đưa ----------
-const lanternPts = [];
-[[0.02,-0.68],[0.28,-0.6],[0.46,-0.28],[0.5,0.05],[0.44,0.35],[0.26,0.58],[0.02,0.66]].forEach(p=>lanternPts.push(new THREE.Vector2(p[0],p[1])));
-const lanternGeo = new THREE.LatheGeometry(lanternPts, 28);
-const lanternMat = new THREE.MeshStandardMaterial({ map:lanternTex, emissive:0xff6a1a, emissiveIntensity:0.9, roughness:0.55 });
-const hangingState=[];
-for(let z=-130; z<=130; z+=30){
-  const baseY=8.5+Math.random()*1.5;
-  for(let k=0;k<7;k++){
-    const x=-24+k*8;
-    const sag=1.4*(1-Math.pow(x/28,2));
-    hangingState.push({ x, y:baseY-sag, z, sc:0.9+Math.random()*0.7, phase:Math.random()*6, col:[0xff2a1a,0xffc21a,0xff7a1a,0x2aff8a,0xff4a9a,0x2ac8ff][(k+z)%6] });
-  }
+// TikTok THẬT qua server.js (socket.io, http://localhost:3000).
+// Bản gốc Sếp gửi chỉ có mô phỏng giả; đoạn nối thật dưới đây là phần
+// tao thêm để cặp server.js + game này chạy với nhau. Khi nối được server,
+// mô phỏng giả tự dừng để khỏi trùng xuồng.
+let liveReal=false;
+function addChatLine(user, comment, color){
+  const div=document.createElement('div');
+  div.innerHTML=`<span style="color:${color||'#ffd700'}">${user}</span>: ${comment}`;
+  chatEl.appendChild(div); chatEl.scrollTop=chatEl.scrollHeight;
+  if(chatEl.children.length>8) chatEl.removeChild(chatEl.firstChild);
 }
-for(const side of [-1,1]){
-  for(let z=-140; z<=140; z+=20){
-    hangingState.push({ x:side*33, y:4.5+Math.random()*1.5, z, sc:0.8+Math.random()*0.6, phase:Math.random()*6, col:[0xff2a1a,0xffc21a,0xff7a1a,0xff4a9a][Math.floor(Math.random()*4)] });
-  }
+function addBoatNearPlayer(user){
+  const b=createBoat(playerGroup.position.x+(Math.random()-0.5)*20, playerGroup.position.z+(Math.random()-0.5)*20);
+  boats.push(b);
+  setTimeout(()=>{ scene.remove(b); }, 30000);
+  return b;
 }
-const HANGING=hangingState.length;
-const hanging=new THREE.InstancedMesh(lanternGeo, lanternMat, HANGING);
-{
-  const col=new THREE.Color();
-  hangingState.forEach((st,i)=>{ hanging.setColorAt(i, col.setHex(st.col)); });
-}
-hanging.castShadow=true; scene.add(hanging);
-// Dây đèn ngang kênh
-{
-  const lineMat=new THREE.LineBasicMaterial({ color:0x222222, transparent:true, opacity:0.8 });
-  const pts=[];
-  for(let z=-130; z<=130; z+=30){ pts.push(new THREE.Vector3(-28,9.5,z), new THREE.Vector3(28,9.5,z)); }
-  const geo=new THREE.BufferGeometry().setFromPoints(pts);
-  scene.add(new THREE.LineSegments(geo, lineMat));
-}
-// Đèn trời bay lên
-const SKY=16;
-const skyLanterns=new THREE.InstancedMesh(lanternGeo, lanternMat.clone(), SKY);
-skyLanterns.material.emissiveIntensity=1.0;
-const skyState=[];
-{
-  const m=new THREE.Matrix4(), col=new THREE.Color();
-  for(let i=0;i<SKY;i++){
-    const st={ x:-18+Math.random()*36, y:3+Math.random()*24, z:-130+Math.random()*260, sp:0.25+Math.random()*0.45, sc:0.7+Math.random()*0.5 };
-    skyState.push(st); m.makeScale(st.sc,st.sc,st.sc); m.setPosition(st.x,st.y,st.z); skyLanterns.setMatrixAt(i,m);
-    skyLanterns.setColorAt(i, col.setHex(i%2?0xffc21a:0xff5a1a));
-  }
-}
-scene.add(skyLanterns);
-
-// ---------- Hoa sen trôi kín sông (thay đèn hoa sen vàng cũ thành sen hồng) ----------
-const floatGeo=new THREE.PlaneGeometry(1.5, 1.5);
-const floatMat=new THREE.MeshStandardMaterial({ map:lotusTex, transparent:true, side:THREE.DoubleSide, roughness:1, emissive:0xff5a8a, emissiveIntensity:0.25, emissiveMap:lotusTex });
-const FLOATN=120;
-const floaters=new THREE.InstancedMesh(floatGeo, floatMat, FLOATN);
-const floatState=[];
-for(let i=0;i<FLOATN;i++){
-  floatState.push({ x:-19+Math.random()*38, z:-140+Math.random()*280, sp:0.6+Math.random()*1.0, sc:0.7+Math.random()*0.6, phase:Math.random()*6, rot:Math.random()*Math.PI*2 });
-}
-scene.add(floaters);
-const releasedLanterns=[];
-function spawnReleasedLantern(at){
-  const grp=new THREE.Group();
-  const body=new THREE.Mesh(floatGeo, floatMat.clone());
-  body.rotation.x=-Math.PI/2; body.scale.setScalar(1.2); grp.add(body);
-  const glow=new THREE.Sprite(new THREE.SpriteMaterial({ map:glowTex, color:0xffb3c8, transparent:true, opacity:0.3, depthWrite:false }));
-  glow.scale.set(0.9,0.9,1); glow.position.y=0.2; grp.add(glow);
-  grp.position.copy(at); grp.position.y=0.4; scene.add(grp);
-  releasedLanterns.push(grp);
-  if(releasedLanterns.length>40){ const old=releasedLanterns.shift(); scene.remove(old); }
-}
-
-// ---------- Nhân vật game ----------
-function limb(r, len, mat){
-  const g=new THREE.Group();
-  const m=new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 4, 12), mat);
-  m.position.y=-len/2; m.castShadow=true; g.add(m); return g;
-}
-function makeGamePerson(opts={}){
-  const { ao=0x6b4a2a, pants=0x3a2a1a, skin=0xe8b88a, gray=false, hat=null, scarf=true, phone=false, pose='sit', girl=false } = opts;
-  const g=new THREE.Group();
-  const aoMat=new THREE.MeshStandardMaterial({ color:ao, roughness:0.9 });
-  const pantsMat=new THREE.MeshStandardMaterial({ color:pants, roughness:0.95 });
-  const skinMat=new THREE.MeshStandardMaterial({ color:skin, roughness:0.7 });
-  const torso=new THREE.Mesh(new THREE.CapsuleGeometry(0.30, 0.55, 6, 14), aoMat);
-  torso.position.y=1.05; torso.castShadow=true; g.add(torso);
-  for(let i=0;i<3;i++){
-    const btn=new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), new THREE.MeshStandardMaterial({ color:0xffe27a, roughness:0.4 }));
-    btn.position.set(0, 1.28-i*0.18, 0.30); g.add(btn);
-  }
-  const headGroup=new THREE.Group(); headGroup.position.y=1.62;
-  const head=new THREE.Mesh(new THREE.SphereGeometry(0.27, 24, 24), skinMat);
-  head.castShadow=true; headGroup.add(head);
-  const face=new THREE.Mesh(new THREE.PlaneGeometry(0.36, 0.36), new THREE.MeshBasicMaterial({ map:faceTex, transparent:true }));
-  face.position.set(0, -0.02, 0.245); headGroup.add(face);
-  const hairMat=new THREE.MeshStandardMaterial({ color: gray?0xdddddd:0x1a1a1a, roughness:1 });
-  const hair=new THREE.Mesh(new THREE.SphereGeometry(0.29, 24, 24, 0, Math.PI*2, 0, Math.PI*0.55), hairMat);
-  hair.position.y=0.05; hair.rotation.x=-0.25; headGroup.add(hair);
-  if(girl){
-    const bun=new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 12), hairMat);
-    bun.position.set(0, 0.22, -0.22); headGroup.add(bun);
-    const longHair=new THREE.Mesh(new RoundedBoxGeometry(0.30, 0.55, 0.08, 2, 0.04), hairMat);
-    longHair.position.set(0, -0.25, -0.24); headGroup.add(longHair);
-  }
-  if(hat){
-    const brim=new THREE.Mesh(new THREE.CylinderGeometry(0.52,0.52,0.05,24), new THREE.MeshStandardMaterial({ color:hat, roughness:1 }));
-    brim.position.y=0.22; headGroup.add(brim);
-    const top=new THREE.Mesh(new THREE.ConeGeometry(0.32, 0.32, 24), new THREE.MeshStandardMaterial({ color:hat, roughness:1 }));
-    top.position.y=0.38; headGroup.add(top);
-  }
-  g.add(headGroup);
-  if(scarf){
-    const sc=new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.08, 8, 20), new THREE.MeshStandardMaterial({ map:scarfTex, roughness:0.9 }));
-    sc.position.y=1.32; sc.rotation.x=Math.PI/2; g.add(sc);
-  }
-  const armL=limb(0.085, 0.5, aoMat); armL.position.set(-0.38, 1.32, 0);
-  const armR=limb(0.085, 0.5, aoMat); armR.position.set(0.38, 1.32, 0);
-  g.add(armL, armR);
-  let legL, legR;
-  if(pose==='sit'){
-    legL=new THREE.Group(); legR=new THREE.Group();
-    for(const [leg, side] of [[legL,-1],[legR,1]]){
-      leg.position.set(side*0.17, 0.68, 0.1);
-      const thigh=new THREE.Mesh(new THREE.CapsuleGeometry(0.11, 0.4, 4, 12), pantsMat);
-      thigh.rotation.x=Math.PI/2; thigh.position.set(0, 0, 0.28); thigh.castShadow=true; leg.add(thigh);
-      const shin=new THREE.Mesh(new THREE.CapsuleGeometry(0.09, 0.4, 4, 12), pantsMat);
-      shin.position.set(0, -0.32, 0.52); shin.castShadow=true; leg.add(shin);
-      const foot=new THREE.Mesh(new RoundedBoxGeometry(0.16, 0.08, 0.28, 2, 0.03), new THREE.MeshStandardMaterial({ color:0x5a3a1a }));
-      foot.position.set(0, -0.58, 0.56); leg.add(foot);
-      g.add(leg);
-    }
-  } else {
-    legL=limb(0.11, 0.75, pantsMat); legL.position.set(-0.17, 0.85, 0);
-    legR=limb(0.11, 0.75, pantsMat); legR.position.set(0.17, 0.85, 0);
-    g.add(legL, legR);
-  }
-  if(phone){
-    const ph=new THREE.Mesh(new RoundedBoxGeometry(0.22, 0.38, 0.03, 1, 0.02), new THREE.MeshStandardMaterial({ color:0x111111, emissive:0x88ccff, emissiveIntensity:0.8 }));
-    ph.position.set(0.42, 1.45, 0.35); ph.rotation.x=-0.3; g.add(ph);
-  }
-  return { group:g, headGroup, armL, armR, legL, legR };
-}
-function makeBoatHull(len=10, wid=2.2){
-  const s=new THREE.Shape();
-  s.moveTo(-len/2,0.5); s.quadraticCurveTo(-len/2-0.3,0,-len/2+0.8,-0.6); s.lineTo(len/2-0.8,-0.6); s.quadraticCurveTo(len/2+0.3,0,len/2,0.5); s.lineTo(len/2-0.6,0.7); s.lineTo(-len/2+0.6,0.7); s.closePath();
-  const geo=new THREE.ExtrudeGeometry(s,{ depth:wid, bevelEnabled:true, bevelThickness:0.08, bevelSize:0.08, bevelSegments:2 }); geo.translate(0,0,-wid/2);
-  const m=new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map:woodTex, roughness:0.9 }));
-  m.castShadow=true; m.receiveShadow=true; return m;
-}
-function makePole(){
-  const g=new THREE.Group();
-  const shaft=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,4.2,8), new THREE.MeshStandardMaterial({ map:bambooTex, roughness:1 }));
-  shaft.position.y=-1.2; g.add(shaft); return g;
-}
-
-// Thuyền chính y ảnh: dài, người nón lá nhiều màu, người chèo đứng chống sào ở đuôi
-const mainBoat=new THREE.Group();
-mainBoat.add(makeBoatHull(10, 2.2));
-const mainPassengers=[];
-{
-  const defs=[
-    { ao:0xd96a8a, girl:true, x:-2.2, z:0.3 },
-    { ao:0xe8c53a, girl:true, x:-0.8, z:-0.4 },
-    { ao:0x3a6a8a, girl:false, x:0.6, z:0.35 },
-    { ao:0x7a4a8a, girl:true, x:1.8, z:-0.3 },
-  ];
-  for(const d of defs){
-    const p=makeGamePerson({ ao:d.ao, hat:0xd9b36a, scarf:false, girl:d.girl });
-    p.group.position.set(d.x, 0.5, d.z); p.group.rotation.y=Math.PI/2;
-    mainBoat.add(p.group); mainPassengers.push(p);
-  }
-}
-const rower=makeGamePerson({ ao:0x4a5a2a, hat:0xd9b36a, scarf:false });
-rower.group.position.set(-4.2, 0.5, 0); rower.group.rotation.y=Math.PI/2;
-mainBoat.add(rower.group);
-const mainPole=makePole(); mainPole.position.set(-4.6, 1.2, 0.4); mainBoat.add(mainPole);
-mainBoat.position.set(0, 0.1, 20); scene.add(shadowed(mainBoat));
-
-// Bạn: nhân vật chính, ban đầu đứng vỉa hè phía đông
-const player=makeGamePerson({ ao:0x1a6a8a, pants:0x222222, pose:'stand', scarf:true });
-player.group.position.set(29, 0.6, 80);
-const playerRing=new THREE.Mesh(new THREE.TorusGeometry(0.6, 0.05, 8, 24), new THREE.MeshStandardMaterial({ color:0xffd94a, emissive:0xffb300, emissiveIntensity:1.2 }));
-playerRing.rotation.x=Math.PI/2; playerRing.position.y=0.05; player.group.add(playerRing);
-const playerName=textSprite('Bạn'); playerName.position.y=2.15; player.group.add(playerName);
-scene.add(shadowed(player.group));
-let playerPos=new THREE.Vector3(29, 0.6, 80);
-let playerYaw=0; // 0 = nhìn về bắc (-Z)
-let playerOnBoat=false, autoWalkTimer=0;
-
-// Thuyền du lịch khác chạy dọc kênh
-function makeTouristBoat(kind){
-  const g=new THREE.Group(); g.add(makeBoatHull(7, 1.7));
-  let p1, p2;
-  if(kind==='tay'){ p1=makeGamePerson({ ao:0x3a5a8a, hat:0xd9b36a, scarf:false }); p2=makeGamePerson({ ao:0x8a3a3a, hat:0xd9b36a, scarf:false, girl:true }); }
-  else if(kind==='ongba'){ p1=makeGamePerson({ ao:0x555555, gray:true }); p2=makeGamePerson({ ao:0x7a4a6a, gray:true, girl:true }); }
-  else { p1=makeGamePerson({ ao:0x222222, phone:true, scarf:false }); p2=makeGamePerson({ ao:0xff6fa8, phone:true, scarf:false, girl:true }); }
-  p1.group.position.set(-1.4,0.5,0); p1.group.rotation.y=Math.PI/2;
-  p2.group.position.set(0.8,0.5,0.2); p2.group.rotation.y=Math.PI/2;
-  g.add(p1.group, p2.group);
-  const lamp=new THREE.Mesh(lanternGeo, new THREE.MeshStandardMaterial({ color:0xff7a1a, emissive:0xff8a1a, emissiveIntensity:1.0 }));
-  lamp.scale.setScalar(0.55); lamp.position.set(-3.2,1.1,0); g.add(lamp);
-  return shadowed(g);
-}
-const boats=[mainBoat];
-const touristBoats=[];
-{
-  const spots=[[-8,40,'tay',1.4], [9,-30,'ongba',1.1], [-10,-90,'genz',1.6], [8,110,'tay',1.2]];
-  for(const [x,z,kind,sp] of spots){
-    const b=makeTouristBoat(kind); b.position.set(x,0.1,z); scene.add(b); boats.push(b);
-    touristBoats.push({ group:b, x, z, dir:Math.random()<0.5?-1:1, speed:sp });
-  }
-}
-let boatCount=boats.length+1; // + thuyền thúng
-document.getElementById('boatCount').textContent=boatCount;
-// Thuyền thúng
-const thung=new THREE.Group();
-{
-  const bowl=new THREE.Mesh(new THREE.LatheGeometry([new THREE.Vector2(0.02,-0.55),new THREE.Vector2(1.1,-0.45),new THREE.Vector2(1.7,-0.05),new THREE.Vector2(1.85,0.3)],24), new THREE.MeshStandardMaterial({ map:bambooTex, side:THREE.DoubleSide, roughness:1 }));
-  bowl.castShadow=true; thung.add(bowl);
-  const fisher=makeGamePerson({ ao:0x4a5a2a, hat:0xd9b36a }); fisher.group.position.y=0.1; fisher.group.rotation.y=Math.PI/2; thung.add(fisher.group);
-}
-thung.position.set(12, 0.1, 20); scene.add(shadowed(thung));
-let thungZ=20, thungDir=1;
-
-// Người đi dạo 2 bờ + ngồi cà phê + sạp hàng
-const walkers=[];
-for(let i=0;i<6;i++){
-  const side=i%2===0?1:-1;
-  const w=makeGamePerson({ ao:[0x2a6a8a,0x8a3a5a,0x3a7a4a,0xb06a1a,0x5a3a8a,0x8a6a2a][i], pants:0x222222, pose:'stand', girl:i%2===1, hat:i===1?0xd9b36a:null, scarf:i%2===0 });
-  const z=-110+i*40;
-  w.group.position.set(side*29, 0.6, z);
-  scene.add(shadowed(w.group));
-  walkers.push({ person:w, x:side*29, z, dir:i%2===0?-1:1, speed:3+Math.random()*1.5, phase:Math.random()*6 });
-}
-const seated=[];
-for(let i=0;i<4;i++){
-  const tx=33, tz=30+i*22;
-  const table=new THREE.Mesh(new RoundedBoxGeometry(1.6,0.12,1.6,2,0.05), new THREE.MeshStandardMaterial({ map:woodTex }));
-  table.position.set(tx,1.3,tz); table.castShadow=true; scene.add(table);
-  const tleg=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.9,8), new THREE.MeshStandardMaterial({ color:0x3a2410 }));
-  tleg.position.set(tx,0.85,tz); scene.add(tleg);
-  const umb=new THREE.Mesh(new THREE.ConeGeometry(1.6,0.8,12), new THREE.MeshStandardMaterial({ color:i%2?0xd94a2a:0x2a6a8a, roughness:0.9 }));
-  umb.position.set(tx,2.6,tz); scene.add(umb);
-  const s=makeGamePerson({ ao:[0xd96a8a,0x3a6a8a,0xe8c53a,0x7a4a6a][i], girl:i%2===0 });
-  s.group.position.set(tx-1.4,0.6,tz); s.group.rotation.y=-Math.PI/2; scene.add(shadowed(s.group));
-  seated.push({ person:s, phase:Math.random()*6 });
-}
-const vendors=[];
-for(let i=0;i<3;i++){
-  const vz=-30+i*30;
-  const awn=new THREE.Mesh(new RoundedBoxGeometry(4,0.15,3,1,0.05), new THREE.MeshStandardMaterial({ color:i%2?0xd94a2a:0x2a8a4a }));
-  awn.position.set(-31,3.0,vz); awn.rotation.z=0.25; awn.castShadow=true; scene.add(awn);
-  const v=makeGamePerson({ ao:0xb06a1a, pose:'stand', hat:0xd9b36a });
-  v.group.position.set(-31,0.6,vz); v.group.rotation.y=Math.PI/2; scene.add(shadowed(v.group));
-  vendors.push({ person:v, phase:Math.random()*6 });
-}
-
-// ---------- Camera: Theo thuyền / Đi dạo theo Bạn / Xoay tự do ----------
-let camMode='orbit';
-const camModes=[
-  { id:'follow', label:'Theo thuyền', btn:'🚣 Camera: Theo thuyền' },
-  { id:'walk', label:'Đi dạo (theo Bạn)', btn:'🚶 Camera: Đi dạo (theo Bạn)' },
-  { id:'orbit', label:'Xem như ảnh', btn:'📸 Camera: Xem như ảnh' },
-];
-function setCamMode(mode){
-  camMode=mode;
-  const m=camModes.find(x=>x.id===mode);
-  document.getElementById('modeLabel').textContent=m.label;
-  document.getElementById('camBtn').textContent=m.btn;
-  controls.enabled=(mode==='orbit');
-  if(mode==='orbit'){ controls.target.set(0,0,-40); }
-  if(mode==='walk' && playerOnBoat){ disembarkPlayer(); }
-}
-document.getElementById('camBtn').addEventListener('click', ()=>{
-  const idx=camModes.findIndex(x=>x.id===camMode);
-  setCamMode(camModes[(idx+1)%camModes.length].id);
-});
-const keys={};
-addEventListener('keydown', e=>{ keys[e.code]=true; });
-addEventListener('keyup', e=>{ keys[e.code]=false; });
-
-// ---------- TikTok live: luật quà ----------
-let releasedCount=0, lampClicks=0;
-const feedEl=document.getElementById('feed');
-function addFeed(text){
-  const d=document.createElement('div'); d.textContent=text; feedEl.prepend(d);
-  while(feedEl.children.length>4) feedEl.removeChild(feedEl.lastChild);
-}
-function updateQuest(){
-  document.getElementById('releasedCount').textContent=releasedCount;
-  document.getElementById('lampCount').textContent=Math.min(lampClicks,5);
-}
-function releaseLantern(n){
-  for(let i=0;i<n;i++){
-    setTimeout(()=>{
-      const at=mainBoat.position.clone(); at.x+= (Math.random()-0.5)*2; at.z+= (Math.random()-0.5)*2;
-      spawnReleasedLantern(at); releasedCount++; updateQuest();
-    }, i*550);
-  }
-}
-function disembarkPlayer(){
-  if(!playerOnBoat) return;
-  mainBoat.remove(player.group); scene.add(player.group);
-  playerOnBoat=false;
-  playerPos.set(29, 0.6, THREE.MathUtils.clamp(mainBoat.position.z, -120, 120));
-  player.group.position.copy(playerPos); playerYaw=0; player.group.rotation.y=playerYaw+Math.PI;
-  showToast('🚶 Bạn đã xuống thuyền', 'Đi dạo phố cổ thôi!');
-}
-function startWalk(sender){
-  disembarkPlayer();
-  autoWalkTimer=22; setCamMode('walk');
-  addFeed('🌹 '+sender+' tặng 1 bông hoa → Bạn đi dạo phố');
-  showToast('🌹 1 bông hoa!', sender+' tặng hoa → Bạn đi dạo phố cổ');
-}
-function boardBoat(n, sender){
-  if(!playerOnBoat){
-    scene.remove(player.group); mainBoat.add(player.group);
-    player.group.position.set(0.2, 0.5, 0.7); player.group.rotation.y=Math.PI/2;
-    playerOnBoat=true; autoWalkTimer=0;
-  }
-  setCamMode('follow');
-  addFeed('🌹 '+sender+' tặng '+n+' bông hoa → Bạn lên thuyền thả hoa sen');
-  showToast('🌹 '+n+' bông hoa!', 'Bạn lên thuyền thả hoa sen 🌸');
-  releaseLantern(Math.min(n,10));
-}
-function handleGift(count, sender){
-  if(count>=5) boardBoat(count, sender);
-  else if(count===1) startWalk(sender);
-  else {
-    addFeed('🌹 '+sender+' tặng '+count+' bông hoa → Thả '+count+' hoa sen');
-    showToast('🌹 '+count+' bông hoa!', 'Thả '+count+' hoa sen xuống sông 🌸');
-    releaseLantern(count);
-  }
-}
-// ---------- Đoàn xuồng TikTok: xuồng 3D thật, KHÔNG phải div portal ----------
-const doanNames=new Set(), doanBoats=[];
-let skyBoostUntilMs=0, boatBoostUntilMs=0;
-function normVN(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
-function bubbleSprite(text){
-  const c=document.createElement('canvas'); c.width=512; c.height=96;
-  const g=c.getContext('2d'); g.fillStyle='rgba(0,0,0,0.65)'; g.beginPath(); g.roundRect(0,0,512,96,20); g.fill();
-  g.fillStyle='#ffe27a'; g.font='bold 32px Arial'; g.textAlign='center'; g.textBaseline='middle';
-  g.fillText(String(text).slice(0,30), 256, 48);
-  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
-  const s=new THREE.Sprite(new THREE.SpriteMaterial({ map:t, transparent:true, depthWrite:false }));
-  s.scale.set(5, 0.94, 1); return s;
-}
-let chatBubble=null;
-function showChatBubble(user, comment){
-  if(chatBubble) mainBoat.remove(chatBubble);
-  chatBubble=bubbleSprite(user+': '+comment); chatBubble.position.set(0, 4.2, 0);
-  mainBoat.add(chatBubble);
-  setTimeout(()=>{ if(chatBubble){ mainBoat.remove(chatBubble); chatBubble=null; } }, 5000);
-}
-function addBoatToDoan(username){
-  const name=String(username||'Người xem');
-  if(doanNames.has(name)) return;
-  doanNames.add(name);
-  const kinds=['tay','ongba','genz']; const b=makeTouristBoat(kinds[doanBoats.length%3]);
-  const label=textSprite(name.slice(0,12)); label.position.y=2.6; b.add(label);
-  scene.add(b);
-  doanBoats.push({ group:b, offset:14+doanBoats.length*12 });
-  if(doanBoats.length>18){ const old=doanBoats.shift(); scene.remove(old.group); doanNames.delete(old.name); doanBoats.forEach((d,i)=>d.offset=14+i*12); }
-  doanBoats[doanBoats.length-1].name=name;
-  boatCount++; document.getElementById('boatCount').textContent=boatCount;
-  showToast('🚣 '+name+' vào đoàn!', 'Đoàn xuồng ba lá: '+boatCount+' xuồng');
-}
-// Pháo hoa 3D: chùm điểm sáng bay rồi tắt, chạy trong vòng lặp animate
-const fireworks=[];
-function spawnFireworkAt(pos, colorHex){
-  const n=42, posArr=new Float32Array(n*3), vel=[];
-  for(let i=0;i<n;i++){ posArr[i*3]=pos.x; posArr[i*3+1]=pos.y; posArr[i*3+2]=pos.z;
-    const a=Math.random()*Math.PI*2, r=2+Math.random()*4;
-    vel.push(new THREE.Vector3(Math.cos(a)*r, 3+Math.random()*5, Math.sin(a)*r)); }
-  const geo=new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(posArr,3));
-  const pts=new THREE.Points(geo, new THREE.PointsMaterial({ color:colorHex, size:0.45, transparent:true, opacity:1 }));
-  scene.add(pts); fireworks.push({ pts, vel, life:1.6 });
-}
-function spawnRoseFireworks(){
-  for(let i=0;i<5;i++){
-    const p=mainBoat.position.clone(); p.x+=(Math.random()-0.5)*14; p.y=6+Math.random()*6; p.z+=(Math.random()-0.5)*14;
-    spawnFireworkAt(p, 0xff5a8a);
-  }
-}
-function lionEffect(sender){
-  skyBoostUntilMs=Date.now()+10000;
-  const glow=document.getElementById('vnGlow'); glow.classList.add('show');
-  setTimeout(()=>glow.classList.remove('show'), 8000);
-  for(let i=0;i<8;i++){ const at=mainBoat.position.clone(); at.x+=(Math.random()-0.5)*4; at.z+=(Math.random()-0.5)*4; spawnReleasedLantern(at); }
-  addFeed('🦁 '+sender+' tặng Sư tử → Bản đồ VN vàng phát sáng, đèn lồng đỏ bay lên!');
-  showToast('🦁 Sư tử!', 'Bản đồ VN vàng phát sáng + đèn lồng đỏ bay lên');
-}
-function carBoost(sender){
-  boatBoostUntilMs=Date.now()+15000;
-  addFeed('🚗 '+sender+' tặng Xe → Xuồng chạy nhanh x2 trong 15s!');
-  showToast('🚗 Xe x2!', 'Xuồng ba lá chạy nhanh gấp đôi 15 giây');
-}
-function handleTikTokGift(user, gift, count){
-  const g=normVN(gift||'');
-  if(g.includes('rose') || g.includes('hoa hong') || g.includes('hoa')){
-    spawnRoseFireworks(); handleGift(Number(count||1), user);
-  } else if(g.includes('lion') || g.includes('su tu')){
-    lionEffect(user); spawnRoseFireworks();
-  } else if(g.includes('car') || g.includes('xe') || g.includes('oto')){
-    carBoost(user);
-  } else {
-    spawnRoseFireworks();
-    for(let i=0;i<5;i++){ const at=mainBoat.position.clone(); spawnReleasedLantern(at); }
-    addFeed('🎁 '+user+' tặng '+gift+' x'+(count||1)+' — đèn lồng đỏ bay lên!');
-    showToast('🎁 '+gift+'!', 'Đèn lồng đỏ bay lên sông Hoài');
-  }
-}
-function handleTikTokChat(user, comment){
-  addFeed('💬 '+user+': '+comment);
-  showChatBubble(user, comment);
-  const c=normVN(comment);
-  if(c.includes('xuong') || c.includes('len xuong')){
-    addBoatToDoan(user);
-    addFeed('👋 '+user+' nói "cho lên xuồng" → đã thêm vào đoàn!');
-  }
-}
-function handleTikTokJoin(user){
-  addFeed('👋 '+user+' vừa tham gia đoàn xuồng ba lá!');
-  addBoatToDoan(user);
-}
-document.getElementById('gift1Btn').addEventListener('click', ()=>handleGift(1,'Bạn (test)'));
-document.getElementById('gift5Btn').addEventListener('click', ()=>handleGift(5,'Bạn (test)'));
-document.getElementById('joinTestBtn').addEventListener('click', ()=>handleTikTokJoin('GenZ123 (test)'));
-document.getElementById('lionTestBtn').addEventListener('click', ()=>handleTikTokGift('Bạn (test)','Sư tử',1));
-document.getElementById('carTestBtn').addEventListener('click', ()=>handleTikTokGift('Bạn (test)','Xe',1));
-document.getElementById('releaseBtn').addEventListener('click', ()=>{
-  releaseLantern(1); addFeed('🌸 Bạn tự thả 1 hoa sen'); showToast('🌸 Thả hoa sen!', 'Chúc mừng - Hội An');
-});
-document.getElementById('joinBtn').addEventListener('click', ()=>handleTikTokJoin('Bạn'));
-document.getElementById('spinBtn').addEventListener('click', (e)=>{
-  controls.autoRotate=!controls.autoRotate;
-  e.currentTarget.textContent='🔄 Xoay 360°: '+(controls.autoRotate?'Bật':'Tắt');
-  if(controls.autoRotate && camMode!=='orbit') setCamMode('orbit');
-});
-let audioCtx=null, musicOn=false, musicTimer=null;
-document.getElementById('musicBtn').addEventListener('click', (e)=>{
-  musicOn=!musicOn; e.currentTarget.textContent='♪ Nhạc: '+(musicOn?'Bật':'Tắt');
-  if(musicOn){
-    audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
-    const delay=audioCtx.createDelay(); delay.delayTime.value=0.45;
-    const fb=audioCtx.createGain(); fb.gain.value=0.35; delay.connect(fb); fb.connect(delay);
-    const out=audioCtx.createGain(); out.gain.value=0.12; out.connect(audioCtx.destination); delay.connect(out);
-    const scale=[293.66,329.63,369.99,440,493.88,587.33]; let step=0;
-    const play=()=>{ if(!musicOn) return;
-      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
-      o.type='triangle'; o.frequency.value=scale[step%scale.length]; step+=(Math.random()<0.3?2:1);
-      const t=audioCtx.currentTime; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.5,t+0.03); g.gain.exponentialRampToValueAtTime(0.001,t+1.4);
-      o.connect(g); g.connect(out); g.connect(delay); o.start(t); o.stop(t+1.5);
-      musicTimer=setTimeout(play, 620);
-    }; play();
-  } else clearTimeout(musicTimer);
-});
-// TikTok thật qua socket.io -> server.js (port 3000), không được thì mô phỏng.
-// Ở chế độ mô phỏng, số người xem là số giả để test — KHÔNG phải viewer thật.
-// Ở chế độ thật, số người xem chỉ đổi khi server gửi 'tiktok-viewers'.
-let liveMode='sim', simTimer=null, viewers=642, tikSocket=null;
-function setLiveStatus(t){ document.getElementById('liveStatus').textContent=t; }
-function scheduleSimGift(){
-  clearTimeout(simTimer);
-  simTimer=setTimeout(()=>{
-    if(liveMode==='sim'){
-      const sender='Người xem '+Math.floor(100+Math.random()*900);
-      handleGift(Math.random()<0.6?1:5, sender);
-    }
-    scheduleSimGift();
-  }, 14000+Math.random()*12000);
-}
-setInterval(()=>{
-  if(liveMode!=='sim') return;
-  viewers=Math.max(500, viewers+Math.floor(Math.random()*21)-10);
-  document.getElementById('viewers').textContent='• '+viewers+' đang xem (mô phỏng)';
-}, 3000);
-scheduleSimGift();
-function connectTikTokLive(){
-  if(typeof window.io==='undefined'){
-    setLiveStatus('Mô phỏng • Chưa tải được socket.io (CDN). Kiểm tra mạng rồi bấm lại.');
-    return;
-  }
-  const serverUrl=(document.getElementById('tiktokServer').value||'http://localhost:3000').trim();
-  const username=(document.getElementById('tiktokUser').value||'').trim().replace(/^@/,'');
-  setLiveStatus('Đang nối '+serverUrl+'…');
-  if(tikSocket) tikSocket.disconnect();
-  tikSocket=window.io(serverUrl);
+if(typeof window.io!=='undefined'){
+  const tikSocket=window.io('http://localhost:3000');
   tikSocket.on('connect', ()=>{
-    liveMode='real'; clearTimeout(simTimer);
-    setLiveStatus('Đã nối server TikTok • Đang chờ live thật');
-    addFeed('✅ Đã nối server TikTok');
-    if(username) tikSocket.emit('set-username', username);
-    document.getElementById('viewers').textContent='• đang live (chờ số thật từ server)';
+    liveReal=true;
+    document.getElementById('info').innerText='✅ Đã nối server TikTok thật — chờ comment / quà thật!';
   });
-  tikSocket.on('live-status', msg=>setLiveStatus(msg));
-  tikSocket.on('tiktok-chat', (user, comment)=>handleTikTokChat(user, comment));
-  tikSocket.on('tiktok-join', (user)=>handleTikTokJoin(user));
-  tikSocket.on('tiktok-gift', (user, gift, count)=>handleTikTokGift(user, gift, count));
-  tikSocket.on('tiktok-viewers', (count)=>{
-    if(liveMode==='real') document.getElementById('viewers').textContent='• '+count+' đang xem';
-  });
-  tikSocket.on('tiktok-like', (user, count)=>{
-    if(liveMode==='real' && Number(count)%50===0) addFeed('❤️ '+user+' thả tim');
-  });
-  tikSocket.on('disconnect', ()=>{
-    if(liveMode==='real'){ liveMode='sim'; setLiveStatus('Mô phỏng • Mất nối server TikTok'); scheduleSimGift(); }
-  });
-  tikSocket.on('connect_error', ()=>{
-    if(liveMode!=='real') setLiveStatus('Mô phỏng • Không nối được '+serverUrl+' — chạy "node server.js" rồi bấm Bắt đầu Live lại.');
-  });
-}
-document.getElementById('startLiveBtn').addEventListener('click', connectTikTokLive);
-
-// ---------- Bấm đèn ----------
-const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
-const clickGlow=new THREE.Sprite(new THREE.SpriteMaterial({ map:glowTex, color:0xffe27a, transparent:true, opacity:0, depthWrite:false }));
-clickGlow.scale.set(4,4,1); scene.add(clickGlow);
-let downPos=null;
-renderer.domElement.addEventListener('pointerdown', ev=>{ downPos=[ev.clientX,ev.clientY]; });
-renderer.domElement.addEventListener('pointerup', ev=>{
-  if(!downPos) return;
-  const moved=Math.hypot(ev.clientX-downPos[0], ev.clientY-downPos[1]); downPos=null;
-  if(moved>6) return;
-  mouse.set((ev.clientX/innerWidth)*2-1, -(ev.clientY/innerHeight)*2+1);
-  ray.setFromCamera(mouse, camera);
-  const hits=ray.intersectObjects([hanging, skyLanterns, floaters]);
-  if(hits.length){
-    const h=hits[0];
-    const arr=h.object.instanceMatrix.array;
-    const pos=new THREE.Vector3().fromArray(arr, h.instanceId*16+12);
-    clickGlow.position.copy(pos); clickGlow.material.opacity=1;
-    lampClicks++; updateQuest();
-    showToast('Chúc mừng - Hội An', 'Đèn vừa sáng rực 🏮 ('+lampClicks+'/5)');
-  }
-});
-
-// ---------- Bloom ----------
-const composer=new EffectComposer(renderer);
-composer.addPass(new RenderPass(scene, camera));
-composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.32, 0.6, 0.85));
-composer.addPass(new OutputPass());
-
-// ---------- Minimap ----------
-const mapCanvas=document.getElementById('minimap');
-const mapCtx=mapCanvas.getContext('2d');
-function mapX(x){ return (x+70)/140*168; }
-function mapY(z){ return (z+150)/300*168; }
-function drawMinimap(){
-  const g=mapCtx; g.clearRect(0,0,168,168);
-  g.fillStyle='#12241f'; g.beginPath(); g.arc(84,84,84,0,Math.PI*2); g.fill(); g.save();
-  g.beginPath(); g.arc(84,84,84,0,Math.PI*2); g.clip();
-  g.fillStyle='#7a7264'; g.fillRect(0,0,168,168);
-  g.fillStyle='#0e2a33'; g.fillRect(mapX(-22),0,mapX(22)-mapX(-22),168);
-  g.fillStyle='#f5b301'; g.fillRect(mapX(-36),mapY(-148),mapX(36)-mapX(-36),8);
-  g.fillStyle='#e6b84c';
-  for(let z=-140;z<150;z+=24){ g.fillRect(mapX(-52),mapY(z),10,10); g.fillRect(mapX(42),mapY(z),10,10); }
-  g.fillStyle='#fff'; g.beginPath(); g.arc(mapX(mainBoat.position.x),mapY(mainBoat.position.z),6,0,Math.PI*2); g.fill();
-  g.fillStyle='#ff2a1a'; g.beginPath(); g.arc(mapX(mainBoat.position.x),mapY(mainBoat.position.z),3,0,Math.PI*2); g.fill();
-  if(!playerOnBoat){ g.fillStyle='#ffe27a'; g.beginPath(); g.arc(mapX(playerPos.x),mapY(playerPos.z),4,0,Math.PI*2); g.fill(); }
-  g.fillStyle='rgba(255,255,255,0.8)';
-  for(const w of walkers){ g.beginPath(); g.arc(mapX(w.x),mapY(w.z),2,0,Math.PI*2); g.fill(); }
-  g.restore();
-}
-
-// ---------- Vòng lặp game: mọi thứ đều cử động ----------
-const clock=new THREE.Clock();
-let elapsed=0, frame=0;
-let mainZ=20, mainDir=-1;
-const dummy=new THREE.Matrix4(), qTmp=new THREE.Quaternion(), eTmp=new THREE.Euler(), sTmp=new THREE.Vector3();
-function animate(){
-  requestAnimationFrame(animate);
-  const dt=Math.min(clock.getDelta(), 0.05); elapsed+=dt; frame++;
-  const t=elapsed;
-  water.material.uniforms.time.value+=dt;
-  // Thuyền chính chạy dọc kênh về phía Chùa Cầu rồi quay lại
-  const boostMul=Date.now()<boatBoostUntilMs ? 2 : 1; // quà Xe: x2 trong 15s
-  const speed=((camMode==='follow' && keys['KeyW']) ? 7 : (camMode==='follow' && keys['KeyS']) ? 1.2 : 3.4)*boostMul;
-  mainZ+=mainDir*speed*dt;
-  if(mainZ<-120){ mainZ=-120; mainDir=1; }
-  if(mainZ>125){ mainZ=125; mainDir=-1; }
-  mainBoat.position.z=mainZ;
-  mainBoat.position.x=Math.sin(mainZ*0.03)*3;
-  mainBoat.position.y=0.1+Math.sin(t*1.1)*0.12;
-  mainBoat.rotation.y=mainDir<0?Math.PI/2:-Math.PI/2;
-  mainBoat.rotation.z=Math.sin(t*0.9)*0.02;
-  warmMain.position.set(mainBoat.position.x, 7, mainBoat.position.z);
-  // Chèo sào + hành khách gật đầu, vẫy nhẹ
-  const poleSwing=Math.sin(t*1.8);
-  mainPole.rotation.x=poleSwing*0.30-0.1;
-  rower.armL.rotation.x=-0.5+poleSwing*0.45; rower.armR.rotation.x=-0.5+poleSwing*0.45;
-  mainPassengers.forEach((p,i)=>{
-    p.headGroup.rotation.x=Math.sin(t*0.9+i)*0.08;
-    p.headGroup.rotation.y=Math.sin(t*0.5+i)*0.12;
-  });
-  // Đoàn xuồng TikTok: bám sau thuyền chính, mỗi xuồng cách nhau 12m
-  for(const d of doanBoats){
-    d.group.position.set(mainBoat.position.x+6, 0.1+Math.sin(t*1.1+d.offset)*0.12, mainBoat.position.z+mainDir*-1*d.offset);
-    d.group.rotation.y=mainBoat.rotation.y;
-  }
-  // Thuyền du lịch chạy dọc kênh
-  for(const tb of touristBoats){
-    tb.z+=tb.dir*tb.speed*boostMul*dt;
-    if(tb.z<-125){ tb.z=-125; tb.dir=1; }
-    if(tb.z>125){ tb.z=125; tb.dir=-1; }
-    tb.group.position.set(tb.x, 0.1+Math.sin(t+tb.z)*0.1, tb.z);
-    tb.group.rotation.y=tb.dir<0?Math.PI/2:-Math.PI/2;
-  }
-  thungZ+=thungDir*0.8*dt; if(thungZ>45){thungZ=45;thungDir=-1;} if(thungZ<-10){thungZ=-10;thungDir=1;}
-  thung.position.set(12+Math.sin(t*0.3)*2, 0.1+Math.sin(t)*0.1, thungZ);
-  thung.rotation.y=Math.sin(t*0.2)*0.3;
-  // Người đi dạo
-  for(const w of walkers){
-    w.z+=w.dir*w.speed*dt;
-    if(w.z>135){ w.z=135; w.dir=-1; }
-    if(w.z<-135){ w.z=-135; w.dir=1; }
-    w.person.group.position.set(w.x, 0.6, w.z);
-    w.person.group.rotation.y=w.dir<0?Math.PI:0;
-    const swing=Math.sin(t*6+w.phase)*0.55;
-    w.person.legL.rotation.x=swing; w.person.legR.rotation.x=-swing;
-    w.person.armL.rotation.x=-swing; w.person.armR.rotation.x=swing;
-    w.person.headGroup.rotation.y=Math.sin(t*0.7+w.phase)*0.15;
-  }
-  seated.forEach((s,i)=>{ s.person.headGroup.rotation.x=Math.sin(t*0.8+s.phase)*0.07; s.person.headGroup.rotation.y=Math.sin(t*0.5+s.phase)*0.1; });
-  vendors.forEach((v,i)=>{ v.person.armR.rotation.x=-0.4+Math.sin(t*2+v.phase)*0.4; v.person.headGroup.rotation.y=Math.sin(t*0.6+v.phase)*0.2; });
-  // Bạn: tự đi dạo khi có quà 1 bông, hoặc WASD
-  let playerMoving=false;
-  if(autoWalkTimer>0){
-    autoWalkTimer-=dt; playerMoving=true;
-    playerPos.z+= (playerYaw===0?-1:1) * 4 * dt;
-    if(playerPos.z<-120){ playerPos.z=-120; playerYaw=Math.PI; }
-    if(playerPos.z>120){ playerPos.z=120; playerYaw=0; }
-  } else if(camMode==='walk' && !playerOnBoat){
-    const fwd=new THREE.Vector3(-Math.sin(playerYaw), 0, -Math.cos(playerYaw));
-    if(keys['KeyW']||keys['ArrowUp']){ playerPos.addScaledVector(fwd, 7*dt); playerMoving=true; }
-    if(keys['KeyS']||keys['ArrowDown']){ playerPos.addScaledVector(fwd, -7*dt); playerMoving=true; }
-    if(keys['KeyA']||keys['ArrowLeft']) playerYaw+=1.9*dt;
-    if(keys['KeyD']||keys['ArrowRight']) playerYaw-=1.9*dt;
-    playerPos.x=THREE.MathUtils.clamp(playerPos.x, 24, 34);
-    playerPos.z=THREE.MathUtils.clamp(playerPos.z, -135, 135);
-  }
-  if(!playerOnBoat){
-    player.group.position.copy(playerPos);
-    player.group.rotation.y=playerYaw+Math.PI;
-    const swing=playerMoving?Math.sin(t*8)*0.6:0;
-    player.legL.rotation.x=swing; player.legR.rotation.x=-swing;
-    player.armL.rotation.x=-swing; player.armR.rotation.x=swing;
-  } else {
-    player.group.position.y=0.5+Math.sin(t*1.1)*0.05;
-  }
-  // Đèn treo đung đưa
-  hangingState.forEach((st,i)=>{
-    eTmp.set(0, Math.sin(t*0.8+st.phase)*0.15, 0); qTmp.setFromEuler(eTmp); sTmp.setScalar(st.sc);
-    dummy.compose(new THREE.Vector3(st.x, st.y+Math.sin(t*1.2+st.phase)*0.08, st.z), qTmp, sTmp);
-    hanging.setMatrixAt(i, dummy);
-  });
-  hanging.instanceMatrix.needsUpdate=true;
-  // Đèn trời bay lên (quà Sư tử: bay nhanh x4 trong 10s)
-  const skyMul=Date.now()<skyBoostUntilMs ? 4 : 1;
-  for(let i=0;i<SKY;i++){ const st=skyState[i]; st.y+=st.sp*0.02*skyMul; if(st.y>34){ st.y=3; st.x=-18+Math.random()*36; st.z=-130+Math.random()*260; }
-    dummy.makeScale(st.sc,st.sc,st.sc); dummy.setPosition(st.x,st.y,st.z); skyLanterns.setMatrixAt(i,dummy); }
-  skyLanterns.instanceMatrix.needsUpdate=true;
-  // Hoa sen trôi về phía nam, nằm phẳng trên mặt nước
-  floatState.forEach((st,i)=>{
-    st.z+=st.sp*dt; if(st.z>155){ st.z=-145; st.x=-19+Math.random()*38; }
-    eTmp.set(-Math.PI/2, 0, st.rot); qTmp.setFromEuler(eTmp); sTmp.setScalar(st.sc);
-    dummy.compose(new THREE.Vector3(st.x, 0.35+Math.sin(t*1.3+st.phase)*0.07, st.z), qTmp, sTmp);
-    floaters.setMatrixAt(i, dummy);
-  });
-  floaters.instanceMatrix.needsUpdate=true;
-  // Hoa sen vừa thả
-  for(let i=releasedLanterns.length-1;i>=0;i--){
-    const rl=releasedLanterns[i]; rl.position.z+=1.1*dt; rl.position.y=0.4+Math.sin(t*1.5+i)*0.08; rl.rotation.y+=0.002;
-    if(rl.position.z>155){ scene.remove(rl); releasedLanterns.splice(i,1); }
-  }
-  // Pháo hoa TikTok: điểm sáng bay lên rồi tắt
-  for(let i=fireworks.length-1;i>=0;i--){
-    const fw=fireworks[i]; fw.life-=dt;
-    const arr=fw.pts.geometry.attributes.position.array;
-    for(let j=0;j<fw.vel.length;j++){
-      arr[j*3]+=fw.vel[j].x*dt; arr[j*3+1]+=fw.vel[j].y*dt; arr[j*3+2]+=fw.vel[j].z*dt; fw.vel[j].y-=4*dt;
+  tikSocket.on('tiktok-chat', (user, comment)=>{
+    addChatLine(user, comment);
+    if(String(comment).toLowerCase().includes('xuồng') || String(comment).toLowerCase().includes('lên')){
+      addBoatNearPlayer(user);
+      document.getElementById('info').innerText=`👋 ${user}: ${comment} - Đã thêm 1 xuồng vào đoàn!`;
     }
-    fw.pts.geometry.attributes.position.needsUpdate=true;
-    fw.pts.material.opacity=Math.max(fw.life/1.6, 0);
-    if(fw.life<=0){ scene.remove(fw.pts); fireworks.splice(i,1); }
-  }
-  if(clickGlow.material.opacity>0) clickGlow.material.opacity*=0.96;
-  // Camera
-  if(camMode==='follow'){
-    const heading=new THREE.Vector3(0,0,mainDir);
-    const behind=heading.clone().multiplyScalar(-13); behind.x+=10; behind.y=6;
-    const desired=mainBoat.position.clone().add(behind);
-    camera.position.lerp(desired, 0.06);
-    camera.lookAt(mainBoat.position.x, mainBoat.position.y+1.6, mainBoat.position.z);
-  } else if(camMode==='walk'){
-    const facing=new THREE.Vector3(-Math.sin(playerYaw), 0, -Math.cos(playerYaw));
-    const behind=facing.clone().multiplyScalar(-7); behind.y=3.2; behind.x+=2;
-    const desired=playerPos.clone().add(behind);
-    if(!playerOnBoat){ camera.position.lerp(desired, 0.12); camera.lookAt(playerPos.x, playerPos.y+1.5, playerPos.z); }
-  } else {
-    controls.update();
-  }
-  if(frame%6===0) drawMinimap();
-  composer.render();
-  const ld=document.getElementById('loading'); if(ld) ld.style.display='none';
+  });
+  tikSocket.on('tiktok-join', (user)=>{
+    addBoatNearPlayer(user);
+    document.getElementById('info').innerText=`👋 ${user} vừa vào live - Đã thêm 1 xuồng vào đoàn!`;
+  });
+  tikSocket.on('tiktok-gift', (user, gift, count)=>{
+    document.getElementById('info').innerText=`🎁 ${user} tặng ${gift||'quà'}${count?' x'+count:''} - Cảm ơn ${user}!`;
+    addChatLine(user, 'tặng '+(gift||'quà'), '#ff6b9d');
+  });
+  tikSocket.on('disconnect', ()=>{ liveReal=false; });
 }
-animate();
-addEventListener('resize', ()=>{
-  camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight);
-});
+// TikTok simulation (chỉ chạy khi chưa nối server thật)
+const chatEl=document.getElementById('chat');
+const fakeUsers=['hanax._','explorerVN','phuc_travel','genz_hoian','batu','tiktok_lover'];
+const fakeComments=['Cho em lên xuồng với','Đẹp quá anh ơi','Thêm đèn lồng đi','Xuồng ba lá quanh rặng dừa đẹp','Thả hoa đăng đi'];
+setInterval(()=>{
+  if(liveReal) return;
+  const u=fakeUsers[Math.floor(Math.random()*fakeUsers.length)];
+  const c=fakeComments[Math.floor(Math.random()*fakeComments.length)];
+  const div=document.createElement('div'); div.innerHTML=`<span style="color:#ffd700">${u}</span>: ${c}`;
+  chatEl.appendChild(div); chatEl.scrollTop=chatEl.scrollHeight;
+  if(c.includes('xuồng') || c.includes('lên')){
+    const b=createBoat(playerGroup.position.x+(Math.random()-0.5)*20, playerGroup.position.z+(Math.random()-0.5)*20);
+    boats.push(b); document.getElementById('info').innerText=`👋 ${u}: ${c} - Đã thêm 1 xuồng vào đoàn!`;
+    setTimeout(()=>{b.remove&&scene.remove(b)},10000);
+  }
+  if(chatEl.children.length>8) chatEl.removeChild(chatEl.firstChild);
+},2200);
+
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight);});
 </script>
 </body>
 </html>
