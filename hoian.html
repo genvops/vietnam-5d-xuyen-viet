@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Hội An 3D - Sông Hoài, Đèn Lồng, Xuồng Ba Lá | Việt Nam 5D</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:#070812;font-family:Inter,system-ui,Arial,sans-serif;color:#fff}
+  #scene{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+  .glass{background:rgba(10,10,26,.72);backdrop-filter:blur(10px);border:1px solid rgba(255,215,0,.35);border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.45)}
+  #top{position:fixed;left:12px;top:12px;z-index:10;padding:12px 14px;max-width:min(430px,calc(100vw - 24px))}
+  #top h1{margin:0;font-size:20px;line-height:1.2;color:#ffe27a}
+  #top p{margin:6px 0 0;font-size:13px;line-height:1.5;color:#f3e9c8;opacity:.95}
+  #top a{color:#ffe27a}
+  #actions{position:fixed;right:12px;top:12px;z-index:10;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+  button{cursor:pointer;border:0;border-radius:999px;padding:12px 16px;font-size:14px;font-weight:700;color:#231303;background:linear-gradient(180deg,#ffe27a,#f5b301);box-shadow:0 4px 18px rgba(245,179,1,.45)}
+  button.secondary{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);box-shadow:none}
+  button:active{transform:scale(.97)}
+  #stats{position:fixed;left:12px;bottom:12px;z-index:10;padding:10px 12px;font-size:13px;line-height:1.6}
+  #stats b{color:#ffe27a}
+  #hint{position:fixed;right:12px;bottom:12px;z-index:10;padding:10px 12px;font-size:13px;text-align:right;line-height:1.6;max-width:280px}
+  #toast{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.9);z-index:20;padding:16px 22px;font-size:20px;font-weight:800;text-align:center;color:#fff600;text-shadow:0 2px 12px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:all .25s}
+  #toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  #toast small{display:block;font-size:13px;color:#fff;font-weight:600;margin-top:4px}
+  #loading{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;background:#070812;text-align:center;padding:20px}
+  #loading .lamp{font-size:52px;animation:floaty 1.6s ease-in-out infinite}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  #loading p{margin:0;color:#ffe27a;font-weight:700}
+  #loading span{font-size:13px;color:#ccc}
+  @media(max-width:600px){#top p{display:none}#hint{display:none}#top h1{font-size:17px}}
+</style>
+<script>
+  // Nếu CDN Three.js không tải được trong 9 giây, báo rõ thay vì để màn hình đen.
+  setTimeout(function(){ if(!window.__hoianReady){ var el=document.getElementById('loading'); if(el){ el.innerHTML='<div class="lamp">🏮</div><p>Chưa tải được cảnh 3D</p><span>Kiểm tra mạng rồi tải lại trang. Three.js được tải từ CDN jsdelivr.</span>'; } } }, 9000);
+</script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<div id="top" class="glass">
+  <h1>🏮 Hội An 3D — Sông Hoài về đêm</h1>
+  <p>Sông Hoài nước nâu lấp lánh, phố cổ tường vàng mái ngói, hàng trăm đèn lồng đỏ vàng cam, rặng dừa nước, hoa sen và hoa đăng trôi sông. Giữa trời là vòng xoáy vàng hình chữ S Việt Nam.</p>
+  <p><a href="index.html">← Về bản đồ Việt Nam 5D</a></p>
+</div>
+
+<div id="actions">
+  <button id="joinBtn">🚣 Tham gia đoàn</button>
+  <button id="spinBtn" class="secondary">🔄 Xoay 360°: Tắt</button>
+  <button id="musicBtn" class="secondary">♪ Nhạc Hội An: Tắt</button>
+</div>
+
+<div id="stats" class="glass">
+  🚣 Xuồng trong đoàn: <b id="boatCount">6</b> &nbsp;•&nbsp; 🏮 Đèn lồng treo: <b>120</b><br>
+  👆 Bấm vào 1 đèn lồng để thắp sáng mạnh hơn
+</div>
+
+<div id="hint" class="glass">
+  🖱️ Kéo chuột để xoay 360°<br>
+  🔍 Lăn chuột để zoom vào cặp đôi xuồng ba lá<br>
+  👆 Bấm đèn lồng = chúc mừng
+</div>
+
+<div id="toast" class="glass">Chúc mừng - Hội An<small>Sông Hoài, đèn lồng, xuồng ba lá</small></div>
+
+<div id="loading"><div class="lamp">🏮</div><p>Đang thắp đèn Hội An…</p><span>Three.js + nước sông Hoài + 120 đèn lồng đang tải</span></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Water } from 'three/addons/objects/Water.js';
+
+window.__hoianReady = true;
+const canvas = document.getElementById('scene');
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+function showToast(title, sub){
+  toastEl.innerHTML = title + (sub ? '<small>'+sub+'</small>' : '');
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 2600);
+}
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x070812);
+scene.fog = new THREE.FogExp2(0x070812, 0.0035);
+
+const camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 1000);
+camera.position.set(22, 14, 34);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 3, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 6;
+controls.maxDistance = 120;
+controls.maxPolarAngle = 1.52;
+controls.autoRotateSpeed = 0.9;
+
+// ---------- Ánh sáng ấm kiểu đèn lồng ----------
+scene.add(new THREE.AmbientLight(0x554433, 1.1));
+const moonLight = new THREE.DirectionalLight(0xffe9a8, 0.7);
+moonLight.position.set(-60, 60, -40);
+scene.add(moonLight);
+const warm = new THREE.PointLight(0xffb347, 900, 60, 1.8);
+warm.position.set(0, 8, 0);
+scene.add(warm);
+
+// ---------- Texture vẽ bằng canvas: nhìn như vật liệu thật, không phẳng xám ----------
+function canvasTexture(w, h, draw, rx=1, ry=1){
+  const c = document.createElement('canvas'); c.width=w; c.height=h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+const wallTex = canvasTexture(512, 512, (g,w,h)=>{
+  g.fillStyle='#e6b84c'; g.fillRect(0,0,w,h);
+  for(let i=0;i<900;i++){ g.fillStyle='rgba(120,80,20,'+(Math.random()*0.12)+')'; g.fillRect(Math.random()*w, Math.random()*h, 2+Math.random()*18, 2+Math.random()*8); }
+  for(let i=0;i<40;i++){ g.fillStyle='rgba(255,240,190,'+(Math.random()*0.10)+')'; g.fillRect(Math.random()*w, Math.random()*h, 20+Math.random()*60, 8+Math.random()*20); }
+  g.fillStyle='rgba(90,60,15,0.25)'; for(let y=0;y<h;y+=64) g.fillRect(0,y,w,2);
+}, 1, 1);
+const roofTex = canvasTexture(512, 256, (g,w,h)=>{
+  g.fillStyle='#7e3323'; g.fillRect(0,0,w,h);
+  for(let y=0;y<h;y+=32){ for(let x=0;x<w;x+=32){
+    g.fillStyle = ((x+y)%64===0) ? '#9c4a30' : '#6d2a1e';
+    g.beginPath(); g.arc(x+16, y+16, 15, 0, Math.PI, true); g.fill();
+    g.fillStyle='rgba(0,0,0,0.22)'; g.fillRect(x, y+28, 32, 4);
+  }}
+}, 3, 1);
+const woodTex = canvasTexture(512, 256, (g,w,h)=>{
+  g.fillStyle='#6b4226'; g.fillRect(0,0,w,h);
+  for(let y=0;y<h;y+=42){ g.fillStyle='rgba(30,16,6,0.55)'; g.fillRect(0,y,w,3); g.fillStyle='rgba(255,210,150,0.14)'; g.fillRect(0,y+3,w,2); }
+  for(let i=0;i<120;i++){ g.strokeStyle='rgba(40,22,8,'+(0.1+Math.random()*0.25)+')'; g.beginPath(); const y=Math.random()*h; g.moveTo(0,y); g.bezierCurveTo(w*0.3,y+4,w*0.6,y-4,w,y); g.stroke(); }
+}, 2, 1);
+const bambooTex = canvasTexture(256, 256, (g,w,h)=>{
+  g.fillStyle='#c9a86a'; g.fillRect(0,0,w,h);
+  for(let x=0;x<w;x+=32){ g.fillStyle='rgba(90,60,20,0.5)'; g.fillRect(x,0,3,h); g.fillStyle='rgba(255,240,200,0.25)'; g.fillRect(x+6,0,8,h); }
+}, 2, 1);
+const scarfTex = canvasTexture(128, 128, (g,w,h)=>{
+  g.fillStyle='#a61e1e'; g.fillRect(0,0,w,h);
+  g.fillStyle='#fff'; for(let x=0;x<w;x+=16) g.fillRect(x,0,5,h); for(let y=0;y<h;y+=16) g.fillRect(0,y,w,5);
+}, 2, 2);
+const leafTex = canvasTexture(256, 256, (g,w,h)=>{
+  g.fillStyle='#2f7a33'; g.fillRect(0,0,w,h);
+  g.strokeStyle='rgba(220,255,200,0.35)'; for(let x=0;x<w;x+=24){ g.beginPath(); g.moveTo(x,0); g.lineTo(x+12,h); g.stroke(); }
+});
+const glowTex = canvasTexture(128, 128, (g,w,h)=>{
+  const r=g.createRadialGradient(64,64,2,64,64,62);
+  r.addColorStop(0,'rgba(255,230,150,1)'); r.addColorStop(0.4,'rgba(255,180,60,0.55)'); r.addColorStop(1,'rgba(255,150,0,0)');
+  g.fillStyle=r; g.fillRect(0,0,w,h);
+});
+
+// ---------- Bầu trời: sao + trăng vàng ----------
+{
+  const n=700, pos=new Float32Array(n*3);
+  for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2, r=140+Math.random()*120, y=25+Math.random()*110;
+    pos[i*3]=Math.cos(a)*r; pos[i*3+1]=y; pos[i*3+2]=Math.sin(a)*r; }
+  const geo=new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  scene.add(new THREE.Points(geo, new THREE.PointsMaterial({ color:0xffe9a8, size:1.4, sizeAttenuation:false, transparent:true, opacity:0.9 })));
+}
+const moon = new THREE.Mesh(new THREE.SphereGeometry(6, 32, 32), new THREE.MeshBasicMaterial({ color:0xffdf80 }));
+moon.position.set(-85, 62, -130); scene.add(moon);
+const moonGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map:glowTex, color:0xffd970, transparent:true, opacity:0.9, depthWrite:false }));
+moonGlow.scale.set(42,42,1); moonGlow.position.copy(moon.position); scene.add(moonGlow);
+
+// ---------- Sông Hoài: Water thật, màu nâu, nắng trăng vàng ----------
+const waterNormals = new THREE.TextureLoader().load('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/textures/waternormals.jpg', t=>{ t.wrapS=t.wrapT=THREE.RepeatWrapping; });
+const water = new Water(new THREE.PlaneGeometry(420, 70), {
+  textureWidth:512, textureHeight:512, waterNormals,
+  sunDirection:new THREE.Vector3(-0.5,0.6,-0.4).normalize(),
+  sunColor:0xffcc66, waterColor:0x241708, distortionScale:2.8, fog: scene.fog !== undefined
+});
+water.rotation.x = -Math.PI/2; water.position.y = 0; scene.add(water);
+const riverBed = new THREE.Mesh(new THREE.PlaneGeometry(420,70), new THREE.MeshStandardMaterial({ color:0x1a0f05, roughness:1 }));
+riverBed.rotation.x=-Math.PI/2; riverBed.position.y=-0.35; scene.add(riverBed);
+
+// ---------- Bờ sông + phố cổ: nhà extrude tường vàng, mái ngói (không hộp xám) ----------
+function houseGeo(w, h, d, roofH){
+  const s = new THREE.Shape();
+  s.moveTo(-w/2,0); s.lineTo(w/2,0); s.lineTo(w/2,h); s.lineTo(0,h+roofH); s.lineTo(-w/2,h); s.closePath();
+  const g = new THREE.ExtrudeGeometry(s, { depth:d, bevelEnabled:false });
+  g.translate(0,0,-d/2); return g;
+}
+function roofGeo(w, d, roofH){
+  const s = new THREE.Shape();
+  s.moveTo(-w/2-0.6,0); s.lineTo(w/2+0.6,0); s.lineTo(0,roofH+0.4); s.closePath();
+  const g = new THREE.ExtrudeGeometry(s, { depth:d+1.2, bevelEnabled:false });
+  g.translate(0,0,-(d+1.2)/2); return g;
+}
+function makeHouse(w,h,d){
+  const grp = new THREE.Group();
+  const wall = new THREE.Mesh(houseGeo(w,h,d,2.2), new THREE.MeshStandardMaterial({ map:wallTex, roughness:0.9 }));
+  grp.add(wall);
+  const roof = new THREE.Mesh(roofGeo(w,d,2.2), new THREE.MeshStandardMaterial({ map:roofTex, roughness:0.95 }));
+  roof.position.y = h; grp.add(roof);
+  // Cửa gỗ + cửa sổ tối: mặt phẳng, không phải hộp
+  const door = new THREE.Mesh(new THREE.PlaneGeometry(w*0.22, h*0.55), new THREE.MeshStandardMaterial({ map:woodTex, color:0x8a5a2a, roughness:0.9 }));
+  door.position.set(0, h*0.28, d/2+0.02); grp.add(door);
+  for(const sx of [-w*0.28, w*0.28]){
+    const win = new THREE.Mesh(new THREE.PlaneGeometry(w*0.18, h*0.28), new THREE.MeshStandardMaterial({ color:0x2a1c08, emissive:0xffb347, emissiveIntensity:0.7 }));
+    win.position.set(sx, h*0.62, d/2+0.02); grp.add(win);
+  }
+  return grp;
+}
+const bankMat = new THREE.MeshStandardMaterial({ color:0x2e3a22, roughness:1 });
+for(const side of [-1, 1]){
+  const bank = new THREE.Mesh(new THREE.PlaneGeometry(420, 26), bankMat);
+  bank.rotation.x=-Math.PI/2; bank.position.set(0, 0.15, side*48); scene.add(bank);
+  const stone = new THREE.Mesh(new THREE.PlaneGeometry(420, 3), new THREE.MeshStandardMaterial({ color:0x6b6257, roughness:1 }));
+  stone.rotation.x=-Math.PI/2; stone.position.set(0, 0.3, side*35.5); scene.add(stone);
+  let x=-190;
+  while(x < 190){
+    const w=9+Math.random()*7, h=6+Math.random()*4, d=9+Math.random()*3;
+    const hs = makeHouse(w,h,d);
+    hs.position.set(x + w/2, 0.3, side*44);
+    if(side>0) hs.rotation.y = Math.PI;
+    scene.add(hs);
+    x += w + 2 + Math.random()*4;
+  }
+}
+
+// ---------- Rặng dừa nước thấp ven sông ----------
+function makePalm(){
+  const g = new THREE.Group();
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.32, 6.5, 8), new THREE.MeshStandardMaterial({ map:bambooTex, roughness:1 }));
+  trunk.position.y=3.2; trunk.rotation.z=0.12; g.add(trunk);
+  const leafMat = new THREE.MeshStandardMaterial({ map:leafTex, side:THREE.DoubleSide, roughness:1 });
+  for(let i=0;i<7;i++){
+    const leaf = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 3.6), leafMat);
+    const a=i/7*Math.PI*2;
+    leaf.position.set(Math.cos(a)*0.4, 6.4, Math.sin(a)*0.4);
+    leaf.rotation.set(Math.PI/2.6, a, 0, 'YXZ'); leaf.translateY(1.4);
+    g.add(leaf);
+  }
+  for(let i=0;i<3;i++){
+    const nut = new THREE.Mesh(new THREE.SphereGeometry(0.22, 10, 10), new THREE.MeshStandardMaterial({ color:0x5a3a1a, roughness:1 }));
+    nut.position.set(Math.cos(i*2)*0.35, 6.1, Math.sin(i*2)*0.35); g.add(nut);
+  }
+  return g;
+}
+for(let i=0;i<34;i++){
+  const p = makePalm();
+  const side = i%2===0 ? -1 : 1;
+  p.position.set(-185 + i*11 + Math.random()*5, 0.3, side*(37+Math.random()*3));
+  p.scale.setScalar(0.85+Math.random()*0.5); p.rotation.y=Math.random()*Math.PI;
+  scene.add(p);
+}
+
+// ---------- Đèn lồng: LatheGeometry (dáng lồng đèn thật), InstancedMesh 120 cái ----------
+const lanternPts = [];
+[[0.02,-0.62],[0.28,-0.55],[0.46,-0.28],[0.5,0.05],[0.44,0.35],[0.26,0.55],[0.02,0.62]].forEach(p=>lanternPts.push(new THREE.Vector2(p[0],p[1])));
+const lanternGeo = new THREE.LatheGeometry(lanternPts, 20);
+const lanternMat = new THREE.MeshStandardMaterial({ color:0xffffff, emissive:0xff9a2a, emissiveIntensity:1.0, roughness:0.6 });
+const HANGING = 120;
+const hanging = new THREE.InstancedMesh(lanternGeo, lanternMat, HANGING);
+const hangingPos = [];
+{
+  const m=new THREE.Matrix4(), q=new THREE.Quaternion(), s=new THREE.Vector3(), col=new THREE.Color();
+  const palette=[0xff2a1a, 0xffc21a, 0xff7a1a, 0xff3b3b, 0xffd94a];
+  for(let i=0;i<HANGING;i++){
+    const side = i%2===0 ? -1 : 1;
+    const x=-185+Math.random()*370, z=side*(24+Math.random()*10), y=3.5+Math.random()*5;
+    hangingPos.push(new THREE.Vector3(x,y,z));
+    q.setFromEuler(new THREE.Euler(0, Math.random()*Math.PI, 0));
+    s.setScalar(0.9+Math.random()*0.8);
+    m.compose(new THREE.Vector3(x,y,z), q, s); hanging.setMatrixAt(i,m);
+    hanging.setColorAt(i, col.setHex(palette[i%palette.length]));
+  }
+}
+scene.add(hanging);
+// Phản chiếu đèn lồng trên mặt nước: vệt sáng dọc, trong suốt
+{
+  const glowMat = new THREE.MeshBasicMaterial({ map:glowTex, color:0xffa02a, transparent:true, opacity:0.28, blending:THREE.AdditiveBlending, depthWrite:false });
+  for(let i=0;i<40;i++){
+    const p=hangingPos[(i*3)%HANGING];
+    const streak = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 5), glowMat);
+    streak.rotation.x=-Math.PI/2; streak.position.set(p.x, 0.25, THREE.MathUtils.clamp(p.z*0.75, -30, 30));
+    scene.add(streak);
+  }
+}
+// Đèn trời bay từ sông lên trời
+const SKY = 36;
+const skyLanterns = new THREE.InstancedMesh(lanternGeo, lanternMat.clone(), SKY);
+skyLanterns.material.emissiveIntensity = 1.2;
+const skyState = [];
+{
+  const m=new THREE.Matrix4(), col=new THREE.Color();
+  for(let i=0;i<SKY;i++){
+    const st={ x:-160+Math.random()*320, y:2+Math.random()*26, z:-25+Math.random()*50, sp:0.25+Math.random()*0.45, sc:0.7+Math.random()*0.5 };
+    skyState.push(st); m.makeScale(st.sc,st.sc,st.sc); m.setPosition(st.x,st.y,st.z); skyLanterns.setMatrixAt(i,m);
+    skyLanterns.setColorAt(i, col.setHex(i%2 ? 0xffc21a : 0xff5a1a));
+  }
+}
+scene.add(skyLanterns);
+
+// ---------- Hoa sen + hoa đăng trôi sông ----------
+function makeLotus(){
+  const g=new THREE.Group();
+  const petalMat=new THREE.MeshStandardMaterial({ color:0xff6fa8, emissive:0xcc2a5a, emissiveIntensity:0.35, side:THREE.DoubleSide, roughness:0.7 });
+  for(let i=0;i<9;i++){
+    const s=new THREE.Shape(); s.moveTo(0,0); s.quadraticCurveTo(0.35,0.5,0,1.1); s.quadraticCurveTo(-0.35,0.5,0,0);
+    const geo=new THREE.ExtrudeGeometry(s,{ depth:0.04, bevelEnabled:false });
+    const petal=new THREE.Mesh(geo, petalMat);
+    petal.rotation.set(-0.7, i/9*Math.PI*2, 0, 'YXZ'); petal.position.y=0.15; g.add(petal);
+  }
+  const leaf=new THREE.Mesh(new THREE.CircleGeometry(1.1, 20), new THREE.MeshStandardMaterial({ color:0x2f7a33, side:THREE.DoubleSide, roughness:1 }));
+  leaf.rotation.x=-Math.PI/2; g.add(leaf); return g;
+}
+const floaters=[];
+for(let i=0;i<26;i++){
+  const isLotus=i%2===0;
+  const f = isLotus ? makeLotus() : new THREE.Group();
+  if(!isLotus){
+    const body=new THREE.Mesh(new THREE.LatheGeometry([new THREE.Vector2(0.02,-0.1),new THREE.Vector2(0.5,0.05),new THREE.Vector2(0.42,0.25),new THREE.Vector2(0.02,0.3)],16), new THREE.MeshStandardMaterial({ color:0xffd94a, emissive:0xff8a1a, emissiveIntensity:1 }));
+    const flame=new THREE.Mesh(new THREE.SphereGeometry(0.12,10,10), new THREE.MeshBasicMaterial({ color:0xffdd55 }));
+    flame.position.y=0.42; f.add(body, flame);
+  }
+  f.position.set(-180+Math.random()*360, 0.35, -28+Math.random()*56);
+  f.scale.setScalar(0.8+Math.random()*0.7);
+  scene.add(f); floaters.push(f);
+}
+
+// ---------- Portal S vàng giữa trời + hạt vàng bay ----------
+{
+  const pts=[ [9,50], [3,48], [-6,44], [-9,38], [-2,33], [7,30], [8,24], [0,19], [-8,15] ].map(p=>new THREE.Vector3(p[0],p[1],-18));
+  const curve=new THREE.CatmullRomCurve3(pts);
+  const tube=new THREE.Mesh(new THREE.TubeGeometry(curve, 80, 0.85, 12, false), new THREE.MeshStandardMaterial({ color:0xffc21a, emissive:0xffb300, emissiveIntensity:1.6, roughness:0.3, metalness:0.6 }));
+  tube.name='portalS'; scene.add(tube);
+  const glowTube=new THREE.Mesh(new THREE.TubeGeometry(curve, 80, 1.6, 12, false), new THREE.MeshBasicMaterial({ color:0xffd94a, transparent:true, opacity:0.18, blending:THREE.AdditiveBlending, depthWrite:false }));
+  scene.add(glowTube);
+}
+{
+  const n=320, pos=new Float32Array(n*3), spd=[];
+  for(let i=0;i<n;i++){ pos[i*3]=-180+Math.random()*360; pos[i*3+1]=5+Math.random()*45; pos[i*3+2]=-30+Math.random()*60; spd.push(0.6+Math.random()*1.4); }
+  const geo=new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  const pts=new THREE.Points(geo, new THREE.PointsMaterial({ color:0xffd94a, size:0.9, map:glowTex, transparent:true, opacity:0.95, blending:THREE.AdditiveBlending, depthWrite:false }));
+  pts.name='goldDust'; pts.userData.spd=spd; scene.add(pts);
+}
+
+// ---------- Người: capsule áo bà ba + đầu, tóc, khăn rằn (không hộp xám) ----------
+function makePerson({ ao=0x6b4a2a, skin=0xe8b88a, hair=0x1a1a1a, gray=false, hat=null, scarf=true, phone=false }={}){
+  const g=new THREE.Group();
+  const aoMat=new THREE.MeshStandardMaterial({ color:ao, roughness:0.9 });
+  const body=new THREE.Mesh(new THREE.CapsuleGeometry(0.32, 0.75, 6, 14), aoMat);
+  body.position.y=0.75; g.add(body);
+  const head=new THREE.Mesh(new THREE.SphereGeometry(0.29, 20, 20), new THREE.MeshStandardMaterial({ color:skin, roughness:0.7 }));
+  head.position.y=1.55; g.add(head);
+  const hairMat=new THREE.MeshStandardMaterial({ color: gray?0xdddddd: hair, roughness:1 });
+  const hairMesh=new THREE.Mesh(new THREE.SphereGeometry(0.31, 20, 20, 0, Math.PI*2, 0, Math.PI*0.55), hairMat);
+  hairMesh.position.y=1.6; hairMesh.rotation.x=-0.25; g.add(hairMesh);
+  const bun=new THREE.Mesh(new THREE.SphereGeometry(0.14, 12, 12), hairMat);
+  bun.position.set(0, 1.78, -0.22); g.add(bun);
+  if(scarf){
+    const sc=new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.09, 8, 18), new THREE.MeshStandardMaterial({ map:scarfTex, roughness:0.9 }));
+    sc.position.y=1.28; sc.rotation.x=Math.PI/2; g.add(sc);
+  }
+  if(hat){
+    const brim=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.5,0.06,20), new THREE.MeshStandardMaterial({ color:hat, roughness:1 }));
+    brim.position.y=1.82; g.add(brim);
+    const top=new THREE.Mesh(new THREE.CylinderGeometry(0.24,0.3,0.28,20), new THREE.MeshStandardMaterial({ color:hat, roughness:1 }));
+    top.position.y=1.96; g.add(top);
+  }
+  for(const side of [-1,1]){
+    const arm=new THREE.Mesh(new THREE.CapsuleGeometry(0.09, 0.5, 4, 10), aoMat);
+    arm.position.set(side*0.42, 0.95, 0.1); arm.rotation.z=side*-0.5; arm.rotation.x=0.4; g.add(arm);
+  }
+  if(phone){
+    const ph=new THREE.Mesh(new THREE.PlaneGeometry(0.22,0.38), new THREE.MeshStandardMaterial({ color:0x111111, emissive:0x88ccff, emissiveIntensity:0.8 }));
+    ph.position.set(0.45, 1.45, 0.35); ph.rotation.x=-0.3; g.add(ph);
+  }
+  return g;
+}
+function makeBoatHull(len=6.4, wid=1.5){
+  const s=new THREE.Shape();
+  s.moveTo(-len/2,0.35); s.lineTo(-len/2+0.7,-0.55); s.lineTo(len/2-0.7,-0.55); s.lineTo(len/2,0.35); s.lineTo(len/2-0.5,0.55); s.lineTo(-len/2+0.5,0.55); s.closePath();
+  const geo=new THREE.ExtrudeGeometry(s,{ depth:wid, bevelEnabled:false }); geo.translate(0,0,-wid/2);
+  return new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map:woodTex, roughness:0.9 }));
+}
+function makePaddle(){
+  const g=new THREE.Group();
+  const shaft=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,2.4,8), new THREE.MeshStandardMaterial({ map:woodTex, roughness:1 }));
+  shaft.rotation.z=0.6; g.add(shaft);
+  const s=new THREE.Shape(); s.moveTo(-0.22,0); s.lineTo(0.22,0); s.lineTo(0.18,0.9); s.lineTo(-0.18,0.9); s.closePath();
+  const blade=new THREE.Mesh(new THREE.ExtrudeGeometry(s,{ depth:0.06, bevelEnabled:false }), new THREE.MeshStandardMaterial({ map:woodTex, roughness:1 }));
+  blade.position.set(1.05,-0.9,0); blade.rotation.z=0.6; g.add(blade);
+  return g;
+}
+function makeTouristBoat(kind){
+  const g=new THREE.Group();
+  g.add(makeBoatHull(6.2, 1.5));
+  let p1=makePerson({ ao:0x3a5a8a, hat:0xd9b36a, scarf:false });
+  let p2=makePerson({ ao:0x8a3a3a, hat:0xd9b36a, scarf:false });
+  if(kind==='tay'){ p1.position.set(-1.2,0.5,0); p2.position.set(0.4,0.5,0.2); }
+  if(kind==='ongba'){ p1=makePerson({ ao:0x555555, gray:true }); p2=makePerson({ ao:0x7a4a6a, gray:true }); p1.position.set(-1.2,0.5,0); p2.position.set(0.4,0.5,0.2); }
+  if(kind==='genz'){ p1=makePerson({ ao:0x222222, phone:true, scarf:false }); p2=makePerson({ ao:0xff6fa8, phone:true, scarf:false }); p1.position.set(-1.2,0.5,0); p2.position.set(0.4,0.5,0.2); }
+  g.add(p1,p2);
+  const pad=makePaddle(); pad.position.set(1.8,0.8,0); g.add(pad);
+  const lamp=new THREE.Mesh(lanternGeo, new THREE.MeshStandardMaterial({ color:0xff7a1a, emissive:0xff8a1a, emissiveIntensity:1.4 }));
+  lamp.scale.setScalar(0.55); lamp.position.set(-2.8,1.1,0); g.add(lamp);
+  return g;
+}
+
+// Xuồng chính: cặp đôi áo bà ba nâu, khăn rằn, ngồi nhìn nhau
+const mainBoat=new THREE.Group();
+mainBoat.add(makeBoatHull(7, 1.6));
+{
+  const boy=makePerson({ ao:0x6b4a2a }); boy.position.set(-0.9,0.5,0); boy.rotation.y=Math.PI/2; boy.scale.setScalar(1.05);
+  const girl=makePerson({ ao:0x5a3a22 }); girl.position.set(0.9,0.5,0); girl.rotation.y=-Math.PI/2; girl.scale.setScalar(1.0);
+  mainBoat.add(boy, girl);
+  const pad=makePaddle(); pad.position.set(2.2,0.8,0.4); mainBoat.add(pad);
+  const lamp=new THREE.Mesh(lanternGeo, new THREE.MeshStandardMaterial({ color:0xff2a1a, emissive:0xff5a1a, emissiveIntensity:1.5 }));
+  lamp.scale.setScalar(0.7); lamp.position.set(-3.1,1.2,0); mainBoat.add(lamp);
+}
+mainBoat.position.set(0, 0.1, 0); scene.add(mainBoat);
+
+// Thuyền thúng tròn giữa sông
+const thung=new THREE.Group();
+{
+  const bowl=new THREE.Mesh(new THREE.LatheGeometry([new THREE.Vector2(0.02,-0.55),new THREE.Vector2(1.1,-0.45),new THREE.Vector2(1.7,-0.05),new THREE.Vector2(1.85,0.3)],24), new THREE.MeshStandardMaterial({ map:bambooTex, side:THREE.DoubleSide, roughness:1 }));
+  thung.add(bowl);
+  const fisher=makePerson({ ao:0x4a5a2a, hat:0xd9b36a }); fisher.position.y=0.1; thung.add(fisher);
+}
+thung.position.set(11, 0.1, 7); scene.add(thung);
+
+// 4-5 xuồng đoàn du lịch ban đầu
+const boats=[mainBoat, thung];
+const boatSpots=[[-19,9,'tay'],[17,-10,'ongba'],[-31,-7,'genz'],[29,11,'tay'],[-42,4,'ongba']];
+for(const [x,z,kind] of boatSpots){ const b=makeTouristBoat(kind); b.position.set(x,0.1,z); b.rotation.y=Math.random()*0.8-0.4; scene.add(b); boats.push(b); }
+let boatCount=boats.length;
+document.getElementById('boatCount').textContent=boatCount;
+
+document.getElementById('joinBtn').addEventListener('click', ()=>{
+  const kinds=['tay','ongba','genz']; const kind=kinds[boatCount%3];
+  const b=makeTouristBoat(kind);
+  b.position.set(-8 - boatCount*3.2, 0.1, 12 + (boatCount%2)*4);
+  b.rotation.y=0.2; scene.add(b); boats.push(b); boatCount++;
+  document.getElementById('boatCount').textContent=boatCount;
+  showToast('🚣 Đã thêm xuồng số '+boatCount+' vào đoàn!', 'Chào mừng bạn đến Hội An — sông Hoài đang đợi');
+});
+document.getElementById('spinBtn').addEventListener('click', (e)=>{
+  controls.autoRotate=!controls.autoRotate;
+  e.currentTarget.textContent='🔄 Xoay 360°: '+(controls.autoRotate?'Bật':'Tắt');
+});
+let audioCtx=null, musicOn=false, musicTimer=null;
+document.getElementById('musicBtn').addEventListener('click', (e)=>{
+  musicOn=!musicOn; e.currentTarget.textContent='♪ Nhạc Hội An: '+(musicOn?'Bật':'Tắt');
+  if(musicOn){
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    const delay=audioCtx.createDelay(); delay.delayTime.value=0.45;
+    const fb=audioCtx.createGain(); fb.gain.value=0.35; delay.connect(fb); fb.connect(delay);
+    const out=audioCtx.createGain(); out.gain.value=0.12; out.connect(audioCtx.destination); delay.connect(out);
+    const scale=[293.66,329.63,369.99,440,493.88,587.33];
+    let step=0;
+    const play=()=>{ if(!musicOn) return;
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type='triangle'; o.frequency.value=scale[step%scale.length]; step+= (Math.random()<0.3?2:1);
+      const t=audioCtx.currentTime; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.5,t+0.03); g.gain.exponentialRampToValueAtTime(0.001,t+1.4);
+      o.connect(g); g.connect(out); g.connect(delay); o.start(t); o.stop(t+1.5);
+      musicTimer=setTimeout(play, 620);
+    };
+    play();
+  } else { clearTimeout(musicTimer); }
+});
+
+// ---------- Bấm đèn lồng: sáng mạnh + chữ chúc mừng ----------
+const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
+const clickGlow=new THREE.Sprite(new THREE.SpriteMaterial({ map:glowTex, color:0xffe27a, transparent:true, opacity:0, depthWrite:false }));
+clickGlow.scale.set(4,4,1); scene.add(clickGlow);
+renderer.domElement.addEventListener('pointerdown', (ev)=>{
+  mouse.set((ev.clientX/innerWidth)*2-1, -(ev.clientY/innerHeight)*2+1);
+  ray.setFromCamera(mouse, camera);
+  const hits=ray.intersectObjects([hanging, skyLanterns]);
+  if(hits.length){
+    const h=hits[0]; const pos=new THREE.Vector3();
+    if(h.object===hanging){ hanging.getMatrixAt(h.instanceId, new THREE.Matrix4()); pos.fromArray(hanging.instanceMatrix.array, h.instanceId*16+12); }
+    else { skyLanterns.getMatrixAt(h.instanceId, new THREE.Matrix4()); pos.fromArray(skyLanterns.instanceMatrix.array, h.instanceId*16+12); }
+    clickGlow.position.copy(pos); clickGlow.material.opacity=1;
+    showToast('Chúc mừng - Hội An', 'Đèn lồng vừa sáng rực trên sông Hoài 🏮');
+  }
+});
+
+// ---------- Vòng lặp: nước, đèn bay, hạt vàng, xuồng nhấp nhô ----------
+const clock=new THREE.Clock();
+const dummy=new THREE.Matrix4();
+function animate(){
+  requestAnimationFrame(animate);
+  const t=clock.getElapsedTime();
+  water.material.uniforms.time.value += 1/60;
+  const portal=scene.getObjectByName('portalS'); if(portal){ portal.position.y=Math.sin(t*0.7)*1.2; portal.rotation.y=Math.sin(t*0.2)*0.12; }
+  const dust=scene.getObjectByName('goldDust');
+  if(dust){ const p=dust.geometry.attributes.position;
+    for(let i=0;i<p.count;i++){ let y=p.getY(i)-dust.userData.spd[i]*0.02; if(y<2) y=48; p.setY(i,y); }
+    p.needsUpdate=true;
+  }
+  for(let i=0;i<SKY;i++){ const st=skyState[i]; st.y+=st.sp*0.02; st.x+=Math.sin(t+ i)*0.005; if(st.y>32){ st.y=2; st.x=-160+Math.random()*320; }
+    dummy.makeScale(st.sc,st.sc,st.sc); dummy.setPosition(st.x,st.y,st.z); skyLanterns.setMatrixAt(i,dummy); }
+  skyLanterns.instanceMatrix.needsUpdate=true;
+  boats.forEach((b,idx)=>{ b.position.y=0.1+Math.sin(t*1.1+idx)*0.12; b.rotation.z=Math.sin(t*0.9+idx)*0.02; b.rotation.x=Math.sin(t*0.7+idx*2)*0.015; });
+  floaters.forEach((f,idx)=>{ f.position.x+=0.06; if(f.position.x>190) f.position.x=-190; f.position.y=0.35+Math.sin(t+idx)*0.08; f.rotation.y+=0.001; });
+  if(clickGlow.material.opacity>0) clickGlow.material.opacity*=0.96;
+  controls.update();
+  renderer.render(scene, camera);
+  const ld=document.getElementById('loading'); if(ld) ld.style.display='none';
+}
+animate();
+
+addEventListener('resize', ()=>{
+  camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
