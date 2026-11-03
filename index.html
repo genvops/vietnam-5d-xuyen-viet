@@ -1,265 +1,38 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>VIỆT NAM 5D XUYÊN VIỆT - TRAI VIỆT GÁI VIỆT</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title>VIỆT NAM 5D</title>
 <style>
-/* Màu đỏ vàng Việt Nam, chữ gỗ cổ (serif đậm), nền tối để live OBS nổi */
-*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#1a0505;color:#fff}
-.wrap{max-width:860px;margin:0 auto;padding:12px 12px 90px}
-header{text-align:center}
-h1{font-family:Georgia,'Times New Roman',serif;margin:6px 0 2px;font-size:clamp(22px,5vw,38px);background:linear-gradient(180deg,#ffe27a,#ff9d00);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 2px 0 rgba(0,0,0,.2)}
-.sub{color:#ffd97a;font-size:14px}
-.musicbar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:center;background:#3d0a0a;border:1px solid #ffcc33;border-radius:14px;padding:8px;margin:12px 0}
-.musicbar button,.btn{background:#ffcc00;color:#7a0000;border:0;border-radius:999px;padding:9px 14px;font-weight:800;cursor:pointer}
-.musicbar button:hover,.btn:hover{transform:scale(1.03)} .ghost{background:#fff;color:#7a0000}
-#nowSong{font-size:13px;color:#ffe27a;min-width:180px;text-align:center}
-/* Sân khấu bản đồ */
-.stage{position:relative;height:620px;border-radius:20px;overflow:hidden;background:radial-gradient(circle at 50% 40%,#5b1212,#1a0505 70%);border:2px solid #ffcc33}
-#bg{position:absolute;inset:0;width:100%;height:100%}
-svg.smap{position:absolute;left:50%;top:2%;width:52%;height:96%;transform:translateX(-50%);filter:drop-shadow(0 0 18px #ffcc33)}
-/* Cổng hologram vàng */
-.portal{position:absolute;transform:translate(-50%,-50%);width:62px;height:62px;border-radius:50%;border:2px solid #ffe27a;background:radial-gradient(circle,rgba(255,220,100,.95),rgba(255,120,0,.55));color:#3d0000;font-weight:800;font-size:11px;line-height:1.1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 16px #ffcc33;animation:spinGlow 5s ease-in-out infinite;z-index:3}
-.portal:hover{transform:translate(-50%,-50%) scale(1.18)} .portal.big{width:92px;height:92px;font-size:13px;z-index:4}
-.portal small{font-size:16px} .portal.visited{outline:3px solid #fff}
-@keyframes spinGlow{0%,100%{box-shadow:0 0 12px #ffcc33}50%{box-shadow:0 0 28px #fff176}}
-/* Cặp trai gái Việt trên phương tiện bay */
-#couple{position:absolute;transform:translate(-50%,-50%);transition:left 1s ease,top 1s ease;z-index:5;text-align:center;pointer-events:none}
-#couple .boat{font-size:42px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.6));animation:float 2.2s ease-in-out infinite}
-#couple .people{font-size:26px} #couple .label{background:#000a;padding:3px 8px;border-radius:999px;font-size:11px;color:#ffe27a}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-/* Đường hầm 5D nhẹ khi bay */
-#tunnel{display:none;position:absolute;inset:0;z-index:8;background:radial-gradient(circle,transparent 20%,rgba(255,200,0,.55) 55%,#ff6a00);align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#fff;text-align:center}
-#tunnel.show{display:flex;animation:tun .9s ease}
-@keyframes tun{from{opacity:0}to{opacity:1}}
-#toast{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:#ffcc00;color:#7a0000;padding:10px 16px;border-radius:999px;font-weight:900;z-index:9;display:none;text-align:center;max-width:92%}
-.card{background:#fff;color:#222;border-radius:18px;padding:16px;margin:14px 0;box-shadow:0 4px 18px rgba(0,0,0,.3)}
-.card h2{margin:0 0 6px;color:#a40000} .card p{margin:4px 0}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
-.stamp{border:1px dashed #c00;border-radius:12px;padding:8px;text-align:center;font-size:12px;background:#fff8e1}
-.stamp.done{background:#ffe27a}
-/* Cảnh Miền Tây đặc biệt */
-#mientay{display:none;background:linear-gradient(180deg,#87ceeb,#d9a066);color:#222;border-radius:18px;padding:16px;margin:14px 0}
-#mientay .river{position:relative;height:170px;background:linear-gradient(180deg,#7ec8e3,#6b4a2f);border-radius:14px;overflow:hidden;cursor:pointer}
-#mientay .tree{position:absolute;font-size:52px;animation:sway 3s ease-in-out infinite}
-@keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
-.coconut{position:absolute;font-size:28px;cursor:pointer}
-.tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;display:flex;gap:6px;background:#2b0505;border:1px solid #ffcc33;padding:6px;border-radius:999px;z-index:20;max-width:96vw;overflow:auto}
-.tabs button{background:transparent;color:#ffe27a;border:0;padding:9px 10px;font-weight:800;cursor:pointer;white-space:nowrap}
-.tabs button.active{background:#ffcc00;color:#7a0000;border-radius:999px}
-.panel{display:none} .panel.active{display:block}
-input[type=text],input[type=range]{padding:10px;border-radius:10px;border:1px solid #ccc;font-size:16px}
-input[type=text]{flex:1;min-width:140px}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
-.musicRow{display:flex;justify-content:space-between;gap:8px;background:#fff8e1;border-radius:10px;padding:8px;margin:6px 0;font-size:13px}
-@media(max-width:560px){.stage{height:560px}.portal{width:54px;height:54px;font-size:10px}.portal.big{width:80px;height:80px}svg.smap{width:64%}}
+body{margin:0;background:#0a0a1a;color:white;font-family:Arial;overflow:hidden}
+#map{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:380px;height:650px;background:linear-gradient(gold,yellow);clip-path:path("M150 0 C200 0 250 50 250 150 C250 250 200 300 180 400 C160 500 150 650 100 650 C50 650 0 500 20 400 C40 300 100 250 100 150 C100 50 100 0 150 0 Z");box-shadow:0 0 40px gold;display:flex;align-items:center;justify-content:center;font-size:30px;color:red;font-weight:bold}
+.portal{position:absolute;width:110px;height:110px;border-radius:50%;border:3px solid gold;background:rgba(255,215,0,0.2);display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;cursor:pointer;animation:float 3s infinite}
+.portal:hover{transform:scale(1.2);background:gold;color:black}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+.char{position:absolute;font-size:50px;animation:float 2s infinite}
+#info{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);padding:10px 20px;border-radius:20px;border:2px solid gold}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header>
-<h1>🇻🇳 VIỆT NAM 5D XUYÊN VIỆT</h1>
-<div class="sub">TRAI VIỆT • GÁI VIỆT • 15 TỈNH • KHÔNG GIÁP VÕ LÂM • CHỈ ĐỒ VIỆT THƯỜNG NGÀY</div>
-</header>
-
-<!-- Thanh nhạc góc phải trên (đặt trên cùng cho dễ bấm khi live) -->
-<div class="musicbar">
-<span id="nowSong">🎵 Chưa chọn tỉnh — bấm 1 cổng để nghe nhạc tỉnh đó</span>
-<button onclick="togglePlay()" id="playBtn">▶️ Play</button>
-<label>🔊 <input type="range" id="vol" min="0" max="100" value="70" onchange="setVol(this.value)"></label>
-<button onclick="toggleAuto()" id="autoBtn">🔁 Auto-play: BẬT</button>
-<button onclick="toggleMode()" id="modeBtn">🔂 Lặp</button>
-<button onclick="document.getElementById('musicPanel').scrollIntoView({behavior:'smooth'})">📁 UPLOAD NHẠC</button>
-</div>
-
-<!-- Sân khấu chính -->
-<div class="stage" id="stage">
-<canvas id="bg"></canvas>
-<!-- Bản đồ chữ S vàng kim, phát sáng, xoay nhẹ bằng CSS filter + animation trên nhóm -->
-<svg class="smap" viewBox="0 0 200 420" aria-label="Bản đồ Việt Nam hình chữ S">
-<path d="M120 8 C80 20 55 35 85 60 C110 82 75 110 95 145 C115 180 70 205 95 240 C120 275 75 305 100 340 C120 370 85 395 105 412 L125 412 C140 380 150 350 125 320 C100 290 145 260 120 225 C95 190 140 165 115 130 C90 95 130 70 110 40 C100 22 130 12 120 8 Z" fill="#ffcc00" stroke="#fff176" stroke-width="3" opacity=".92"/>
-<text x="100" y="210" text-anchor="middle" fill="#7a0000" font-size="13" font-weight="900">VIỆT NAM</text>
-</svg>
-<div id="portals"></div>
-<div id="couple"><div class="boat" id="boatIcon">🛶</div><div class="people">👨🏻‍🦱 👩🏻</div><div class="label" id="coupleLabel">Trai Việt • Gái Việt</div></div>
-<div id="toast"></div>
-<div id="tunnel">✨ ĐANG BAY 5D ✨<br><span id="tunnelText" style="font-size:16px"></span></div>
-</div>
-
-<!-- Thẻ tỉnh đang chọn -->
-<div class="card" id="detail">
-<h2 id="dName">👋 Bấm 1 cổng để bắt đầu — gợi ý: Hội An ở giữa, to nhất</h2>
-<p id="dOutfit"></p><p id="dVehicle"></p><p id="dDesc"></p>
-<div class="row"><button class="btn" onclick="flyTo(currentId)">✈️ BAY TỚI TỈNH NÀY</button><button class="btn ghost" onclick="snapshot()">📸 Chụp ảnh lưu niệm + tải về</button><button class="btn ghost" onclick="flyRandom()">🎲 BAY NGẪU NHIÊN</button></div>
-<p id="progress">🛂 Hộ chiếu: 0 / 15 tỉnh • 👗 Sưu tầm đồ: 0 / 15 bộ</p>
-</div>
-
-<!-- Cảnh Miền Tây đặc biệt, chỉ hiện khi tới Miền Tây -->
-<div id="mientay">
-<h2 style="margin-top:0">🌴 MIỀN TÂY — CHỢ NỔI • RẶNG DỪA NƯỚC • SÔNG MEKONG</h2>
-<p>Kênh rạch 2 bên rặng dừa nước cao vút, nước nâu phù sa, lục bình trôi. Xuồng ba lá gỗ cũ bơi chầm chậm, lắc lư nhẹ. Bấm vào dừa để dừa rụng, bấm vào mặt nước để tạo sóng.</p>
-<div class="river" id="river" onclick="ripple(event)">
-<span class="tree" style="left:4%;top:8px">🌴</span><span class="tree" style="left:82%;top:4px">🌴</span><span class="tree" style="left:68%;top:30px">🌴</span>
-<span class="coconut" style="left:12%;top:52px" onclick="dropCoconut(event,this)">🥥</span>
-<span class="coconut" style="left:86%;top:46px" onclick="dropCoconut(event,this)">🥥</span>
-<div style="position:absolute;left:50%;top:62%;transform:translateX(-50%);font-size:46px">🛶👨🏻‍🦱👩🏻</div>
-<div style="position:absolute;bottom:8px;left:10px">🌊 lục bình • 🥥 dừa xiêm xanh • 🎋 nón lá</div>
-</div>
-<div class="row"><button class="btn" onclick="drinkCoconut()">🥥 Uống dừa</button><span id="cocoCount">Đã uống: 0 ly • Dừa rụng: 0 trái</span></div>
-<p>🔊 Âm thanh: mái chèo bì bõm, chim kêu (phát bằng nhạc nền tổng hợp khi bấm Uống dừa / bấm nước).</p>
-</div>
-
-<!-- Các tab dưới -->
-<div id="panel-map" class="panel active">
-<div class="card"><h2>💬 LIVE TIKTOK — GÕ COMMENT ĐỂ BAY</h2>
-<p>Gõ không dấu như khi xem live: <b>hoi an, mien tay, da lat, ha noi, sai gon</b>. Gõ <b>yeu viet nam</b> để bắn pháo hoa đỏ vàng.</p>
-<div class="row"><input type="text" id="comment" placeholder="Nhập comment TikTok... ví dụ: mien tay" onkeydown="if(event.key==='Enter')sendComment()"><button class="btn" onclick="sendComment()">Gửi comment</button></div>
-<div class="row" id="quick"></div><p id="liveLog">📺 Chờ comment...</p></div>
-<div class="card" id="musicPanel"><h2>📁 CHỈNH NHẠC — 15 TỈNH</h2>
-<p>File gốc trong <code>/public/music/</code> đang để trống để Sếp tự thay mp3 cùng tên. File Sếp upload ở đây chỉ lưu trên trình duyệt này (localStorage), không up lên server. Muốn nhạc theo web vĩnh viễn, thay file mp3 trong thư mục <code>public/music/</code> rồi đẩy lại GitHub Pages.</p>
-<div id="musicList"></div>
-<div class="row"><button class="btn" onclick="restoreMusic()">🔄 Khôi phục nhạc gốc</button><button class="btn ghost" onclick="exportMusicList()">💾 Xuất danh sách</button></div></div>
-</div>
-
-<div id="panel-quests" class="panel"><div class="card"><h2>🗺️ QUESTS — NHIỆM VỤ XUYÊN VIỆT</h2><div id="quests"></div><button class="btn" onclick="startJourney()">▶️ START JOURNEY! — Bay lần lượt Bắc → Nam</button></div></div>
-<div id="panel-rewards" class="panel"><div class="card"><h2>🏆 REWARDS — HỘ CHIẾU &amp; BẰNG KHEN</h2><p id="rewardText"></p><div class="grid" id="stamps"></div><div id="certificate" style="display:none;margin-top:12px;padding:16px;border:3px solid #c00;border-radius:14px;background:#fff8e1;text-align:center"><h2>🎖️ BẰNG KHEN YÊU NƯỚC</h2><p>Đã đi đủ 15 tỉnh Việt Nam — Trai Việt • Gái Việt • Xuyên Việt 5D</p><p><b>FASHIONISTA XUYÊN VIỆT</b> — Đã sưu tầm đủ 15 bộ đồ Việt Nam thường ngày.</p></div></div></div>
-<div id="panel-shop" class="panel"><div class="card"><h2>🛍️ SHOP — ĐỒ VIỆT THƯỜNG NGÀY (MIỄN PHÍ MẶC THỬ)</h2><p>Không bán giáp, không đồ Trung Quốc. Chỉ áo dài, bà ba, thổ cẩm thường, áo chàm, áo yếm, đồ đi biển thường.</p><div id="shop"></div></div></div>
-
-<p style="text-align:center;color:#ffb3b3;font-size:13px">Tối ưu mobile để live TikTok qua OBS: mở link này làm Browser Source, kéo vừa khung dọc 1080×1920 hoặc ngang 1920×1080 đều được. Nhân vật là hình minh họa phong cách Việt, không dùng ảnh người thật không rõ nguồn.</p>
-</div>
-
-<div class="tabs">
-<button class="active" onclick="showTab('map',this)">🗺️ MAP</button>
-<button onclick="showTab('quests',this)">🗺️ QUESTS</button>
-<button onclick="startJourney();showTab('map',document.querySelector('.tabs button'))">▶️ START JOURNEY!</button>
-<button onclick="showTab('rewards',this)">🏆 REWARDS</button>
-<button onclick="showTab('shop',this)">🛍️ SHOP</button>
-</div>
-
-<audio id="a1"></audio><audio id="a2"></audio>
+<div id="map">VIỆT NAM<br>🇻🇳</div>
+<div class="portal" style="left:10%;top:10%">Hà Nội<br>Xích Lô</div>
+<div class="portal" style="left:20%;top:5%">Hạ Long<br>Thuyền Rồng</div>
+<div class="portal" style="left:5%;top:40%">Sapa<br>Cáp Treo</div>
+<div class="portal" style="left:15%;top:60%">Ninh Bình<br>Đò Nan</div>
+<div class="portal" style="left:5%;top:80%">Huế<br>Thuyền Rồng</div>
+<div class="portal" style="left:35%;top:85%">Hội An<br>Thuyền Thúng</div>
+<div class="portal" style="left:60%;top:85%">Đà Nẵng<br>Cáp Treo</div>
+<div class="portal" style="left:80%;top:70%">Miền Tây<br>Xuồng Ba Lá</div>
+<div class="portal" style="left:85%;top:40%">Nha Trang<br>Cano</div>
+<div class="portal" style="left:80%;top:10%">Hà Giang<br>Xe Máy</div>
+<div class="char" style="left:48%;top:45%">👦</div>
+<div class="char" style="left:52%;top:48%;animation-delay:0.5s">👧</div>
+<div id="info">🛶 Đang đi: Xuồng Ba Lá Miền Tây quanh rặng dừa - Click cổng để bay!</div>
 <script>
-// ===== DỮ LIỆU 15 TỈNH — THỨ TỰ BẮC → NAM, THÀNH HÌNH CHỮ S =====
-// x,y là % trong sân khấu. Hội An ở giữa và to nhất theo yêu cầu.
-const PROVINCES=[
-{id:'hagiang',name:'Hà Giang',key:'ha giang',file:'hagiang.mp3',song:'Hà Giang - Khèn Mông',icon:'🏍️',vehicle:'Xe máy',outfit:'Áo chàm + khăn thổ cẩm',desc:'Đèo Mã Pí Lèng, cột cờ Lũng Cú, hoa tam giác mạch.',x:58,y:7},
-{id:'sapa',name:'Sapa',key:'sa pa',file:'sapa.mp3',song:'Sapa - Sáo Mông',icon:'🚂',vehicle:'Tàu hỏa + cáp treo Fansipan',outfit:'Váy thổ cẩm H’Mông thường',desc:'Ruộng bậc thang, Fansipan, chợ phiên vùng cao.',x:30,y:13},
-{id:'hanoi',name:'Hà Nội',key:'ha noi',file:'hanoi.mp3',song:'Hà Nội - Trống hội',icon:'🛺',vehicle:'Xích lô Hà Nội',outfit:'Áo dài trắng',desc:'Hồ Gươm, phố cổ, Văn Miếu, cốm làng Vòng.',x:58,y:21},
-{id:'halong',name:'Hạ Long',key:'ha long',file:'halong.mp3',song:'Hạ Long - Sáo trúc + sóng biển',icon:'🐉',vehicle:'Thuyền rồng / thuyền buồm',outfit:'Áo thun đi biển',desc:'Vịnh di sản, đảo đá vôi, thuyền rồng trên biển.',x:78,y:23},
-{id:'ninhbinh',name:'Ninh Bình',key:'ninh binh',file:'ninhbinh.mp3',song:'Ninh Bình - Hát chèo',icon:'🛶',vehicle:'Đò nan Tràng An',outfit:'Áo dài + nón lá',desc:'Tràng An, Tam Cốc, cố đô Hoa Lư.',x:52,y:31},
-{id:'phongnha',name:'Phong Nha',key:'phong nha',file:'phongnha.mp3',song:'Phong Nha - Suối rừng',icon:'🛶',vehicle:'Kayak',outfit:'Áo thun + quần jean',desc:'Động Phong Nha - Kẻ Bàng, sông ngầm, rừng xanh.',x:64,y:39},
-{id:'hue',name:'Huế',key:'hue',file:'hue.mp3',song:'Huế - Nhã nhạc cung đình',icon:'🛺',vehicle:'Xích lô tím / thuyền rồng sông Hương',outfit:'Áo dài tím',desc:'Kinh thành, sông Hương, cầu Tràng Tiền, cơm hến.',x:68,y:45},
-{id:'danang',name:'Đà Nẵng',key:'da nang',file:'danang.mp3',song:'Đà Nẵng - Biển xanh',icon:'🚡',vehicle:'Cáp treo Bà Nà Hills (Cầu Vàng)',outfit:'Áo dài cách tân',desc:'Cầu Vàng, Bà Nà Hills, biển Mỹ Khê.',x:76,y:51},
-{id:'hoian',name:'Hội An',key:'hoi an',file:'hoian.mp3',song:'Hội An - Đàn tranh + chuông chùa',icon:'🏮',vehicle:'Thuyền thúng / thuyền đèn lồng',outfit:'Áo dài vàng',desc:'Phố đèn lồng, chùa Cầu, sông Hoài — TỈNH TO NHẤT Ở GIỮA.',x:48,y:57,big:1},
-{id:'nhatrang',name:'Nha Trang',key:'nha trang',file:'nhatrang.mp3',song:'Nha Trang - Gió biển',icon:'🚤',vehicle:'Cano',outfit:'Áo đi biển',desc:'Biển xanh, đảo, tháp Bà Ponagar.',x:73,y:63},
-{id:'dalat',name:'Đà Lạt',key:'da lat',file:'dalat.mp3',song:'Đà Lạt - Guitar mộc',icon:'🚙',vehicle:'Xe jeep',outfit:'Áo len + váy',desc:'Hồ Xuân Hương, đồi thông, hoa, sương mù.',x:58,y:69},
-{id:'saigon',name:'Sài Gòn',key:'sai gon',file:'saigon.mp3',song:'Sài Gòn - Nhịp trẻ',icon:'🚌',vehicle:'Bus 2 tầng / metro',outfit:'Đồ trẻ trung, áo dài cách tân',desc:'Chợ Bến Thành, Nhà thờ Đức Bà, phố đi bộ Nguyễn Huệ.',x:52,y:77},
-{id:'mientay',name:'Miền Tây',key:'mien tay',file:'mientay.mp3',song:'Miền Tây - Lý Cây Bông',icon:'🛶',vehicle:'Xuồng ba lá (CHỈ RIÊNG Miền Tây)',outfit:'Áo bà ba nâu + khăn rằn',desc:'Chợ nổi, rặng dừa nước, sông Mekong, dừa xiêm.',x:36,y:83},
-{id:'phuquoc',name:'Phú Quốc',key:'phu quoc',file:'phuquoc.mp3',song:'Phú Quốc - Sóng đảo',icon:'🚤',vehicle:'Cano / xe jeep đảo',outfit:'Áo hoa đi biển',desc:'Bãi Sao, làng chài, hoàng hôn đảo ngọc.',x:20,y:89},
-{id:'camau',name:'Cà Mau',key:'ca mau',file:'camau.mp3',song:'Cà Mau - Đờn ca tài tử',icon:'🚤',vehicle:'Vỏ lãi / xuồng máy',outfit:'Áo bà ba đen',desc:'Mũi Cà Mau — điểm cực Nam, rừng đước, Đất Mũi.',x:50,y:94},
-];
-let currentId='hoian', visited=new Set(), autoPlay=true, mode='loop', playing=false, cocoDrink=0, cocoDrop=0;
-let audioCtx=null;
-const $=id=>document.getElementById(id);
-// ===== VẼ CỔNG =====
-const portalEl=$('portals');
-PROVINCES.forEach(p=>{
-  const b=document.createElement('button'); b.className='portal'+(p.big?' big':''); b.style.left=p.x+'%'; b.style.top=p.y+'%';
-  b.innerHTML='<small>'+p.icon+'</small>'+p.name; b.title=p.name+' — '+p.vehicle+' — '+p.outfit;
-  b.onclick=()=>flyTo(p.id); portalEl.appendChild(b); p.el=b;
-});
-// Nút comment nhanh
-$('quick').innerHTML=PROVINCES.map(p=>'<button class="btn ghost" onclick="flyTo(\''+p.id+'\')">'+p.icon+' '+p.name+'</button>').join('');
-// ===== NỀN CANVAS: ĐÈN LỒNG, HOA SEN, SAO, LƯỚI TỌA ĐỘ =====
-const cv=$('bg'),ctx=cv.getContext('2d'); let parts=[];
-function resize(){cv.width=cv.offsetWidth;cv.height=cv.offsetHeight}
-function initParts(){parts=[];for(let i=0;i<70;i++)parts.push({x:Math.random()*cv.width,y:Math.random()*cv.height,s:Math.random()*2+1,v:Math.random()*.6+.2,c:Math.random()>.5?'#ffcc33':'#ff6b6b',t:Math.random()>.7?'lantern':(Math.random()>.5?'lotus':'star')})}
-function draw(){ctx.clearRect(0,0,cv.width,cv.height);ctx.strokeStyle='rgba(120,220,255,.12)';for(let x=0;x<cv.width;x+=48){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cv.height);ctx.stroke()}for(let y=0;y<cv.height;y+=48){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke()}
-parts.forEach(p=>{p.y+=p.v;if(p.y>cv.height+10){p.y=-10;p.x=Math.random()*cv.width}ctx.fillStyle=p.c;ctx.font=(p.t==='lantern'?'20px serif':'14px serif');ctx.fillText(p.t==='lantern'?'🏮':(p.t==='lotus'?'🪷':'✦'),p.x,p.y)});requestAnimationFrame(draw)}
-window.addEventListener('resize',()=>{resize();initParts()});resize();initParts();draw();
-// ===== NHẠC: ƯU TIÊN MP3 GỐC, RỒI MP3 UPLOAD, RỒI NHẠC TỔNG HỢP DỰ PHÒNG =====
-function synthMelody(seed){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const base=[523,587,659,784,880];for(let i=0;i<8;i++){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=base[(seed+i)%5];g.gain.setValueAtTime(.0001,audioCtx.currentTime+i*.32);g.gain.exponentialRampToValueAtTime(.08,audioCtx.currentTime+i*.32+.05);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+i*.32+.3);o.connect(g);g.connect(audioCtx.destination);o.start(audioCtx.currentTime+i*.32);o.stop(audioCtx.currentTime+i*.32+.32)}}catch(e){}}
-function playProvinceMusic(p){
-  $('nowSong').textContent='🎵 '+p.song;
-  if(!autoPlay)return;
-  const saved=localStorage.getItem('vn5d_music_'+p.id);
-  const a=$('a1'); a.volume=0; a.src=saved||('public/music/'+p.file); a.loop=(mode==='loop');
-  const tryPlay=a.play(); if(tryPlay)tryPlay.catch(()=>{synthMelody(PROVINCES.indexOf(p))});
-  // Crossfade 2 giây: tăng dần âm lượng
-  let v=0; const iv=setInterval(()=>{v+=.05;a.volume=Math.min(v,($('vol').value/100));if(v>=($('vol').value/100))clearInterval(iv)},100);
-  playing=true; $('playBtn').textContent='⏸️ Pause';
-}
-function togglePlay(){const a=$('a1'); if(playing){a.pause();playing=false;$('playBtn').textContent='▶️ Play'}else{if(a.src)a.play();else playProvinceMusic(PROVINCES.find(x=>x.id===currentId));playing=true;$('playBtn').textContent='⏸️ Pause'}}
-function setVol(v){$('a1').volume=v/100}
-function toggleAuto(){autoPlay=!autoPlay;$('autoBtn').textContent='🔁 Auto-play: '+(autoPlay?'BẬT':'TẮT')}
-function toggleMode(){mode=mode==='loop'?'shuffle':'loop';$('modeBtn').textContent=mode==='loop'?'🔂 Lặp':'🔀 Ngẫu nhiên';$('a1').loop=(mode==='loop')}
-// ===== BAY 5D =====
-function showToast(t){const e=$('toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',3500)}
-function flyTo(id){
-  const p=PROVINCES.find(x=>x.id===id); if(!p)return; currentId=id;
-  $('tunnelText').textContent=(p.vehicle)+' → '+p.name; $('tunnel').classList.add('show');
-  setTimeout(()=>{
-    $('tunnel').classList.remove('show');
-    const c=$('couple'); c.style.left=p.x+'%'; c.style.top=(p.y-6)+'%'; $('boatIcon').textContent=p.icon;
-    $('coupleLabel').textContent=p.name+' • '+p.vehicle;
-    $('dName').textContent='📍 '+p.name.toUpperCase()+' — '+p.vehicle;
-    $('dOutfit').textContent='👗 Trang phục: '+p.outfit+' (Nam: áo tương đồng, tóc ngắn side part gọn; Nữ: tóc dài đen tự nhiên)';
-    $('dVehicle').textContent='🚗 Phương tiện: '+p.vehicle;
-    $('dDesc').textContent=p.desc;
-    visited.add(id); p.el.classList.add('visited');
-    $('mientay').style.display=(id==='mientay'?'block':'none');
-    showToast('['+p.name.toUpperCase()+'] Đã tới '+p.name+' — '+p.outfit+' • '+p.vehicle);
-    $('liveLog').textContent='📺 Đã bay tới '+p.name;
-    playProvinceMusic(p); renderProgress();
-    if(visited.size===15)$('certificate').style.display='block';
-  },900);
-}
-function flyRandom(){const p=PROVINCES[Math.floor(Math.random()*PROVINCES.length)];flyTo(p.id)}
-function renderProgress(){
-  $('progress').textContent='🛂 Hộ chiếu: '+visited.size+' / 15 tỉnh • 👗 Sưu tầm đồ: '+visited.size+' / 15 bộ';
-  $('stamps').innerHTML=PROVINCES.map(p=>'<div class="stamp '+(visited.has(p.id)?'done':'')+'">'+p.icon+'<br><b>'+p.name+'</b><br>'+p.outfit+'<br>'+(visited.has(p.id)?'✅ Đã tới':'○ Chưa tới')+'</div>').join('');
-  $('rewardText').textContent=visited.size>=15?'🎉 ĐỦ 15 TỈNH! Đã cấp BẰNG KHEN YÊU NƯỚC + danh hiệu FASHIONISTA XUYÊN VIỆT.':'Còn '+(15-visited.size)+' tỉnh nữa là đủ Hộ Chiếu VN.';
-  $('quests').innerHTML='<p>✅ Đã tới: '+visited.size+'/15 tỉnh</p><p>'+(visited.has('mientay')?'✅':'○')+' Uống dừa ở Miền Tây ('+cocoDrink+' ly)</p><p>'+(visited.has('hoian')?'✅':'○')+' Ghé Hội An — cổng to nhất ở giữa</p><p>'+(visited.size>=5?'✅':'○')+' Đi 5 tỉnh đầu tiên</p>';
-  $('shop').innerHTML=PROVINCES.map(p=>'<div class="musicRow"><span>'+p.icon+' <b>'+p.name+'</b> — '+p.outfit+'</span><button class="btn" onclick="wearOutfit(\''+p.id+'\')">'+(visited.has(p.id)?'👗 Mặc thử':'🔒 Tới tỉnh này để mở')+'</button></div>').join('');
-}
-function wearOutfit(id){const p=PROVINCES.find(x=>x.id===id);if(!visited.has(id)){showToast('Hãy bay tới '+p.name+' trước để sưu tầm bộ đồ này nhé!');return}$('coupleLabel').textContent='Đang mặc: '+p.outfit+' ('+p.name+')';showToast('Đã mặc thử: '+p.outfit)}
-// ===== LIVE TIKTOK =====
-function norm(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/đ/g,'d').trim()}
-function sendComment(){
-  const raw=$('comment').value; if(!raw)return; const c=norm(raw); $('comment').value='';
-  if(c.includes('yeu viet nam')||c.includes('yeu vn')){fireworks();showToast('🎆 YÊU VIỆT NAM! Pháo hoa đỏ vàng!');$('liveLog').textContent='📺 Comment "'+raw+'" → pháo hoa!';return}
-  const p=PROVINCES.find(x=>c.includes(x.key)||c===x.key);
-  if(p){$('liveLog').textContent='📺 Comment "'+raw+'" → bay tới '+p.name;flyTo(p.id)}else{$('liveLog').textContent='📺 Comment "'+raw+'" chưa khớp tỉnh nào. Thử: hoi an, mien tay, da lat';showToast('Chưa khớp tỉnh nào, thử: hoi an / mien tay / da lat')}
-}
-// Pháo hoa đỏ vàng vẽ trên canvas nền
-function fireworks(){for(let i=0;i<40;i++)parts.push({x:cv.width/2+(Math.random()-.5)*300,y:cv.height/2+(Math.random()-.5)*200,s:3,v:.2,c:Math.random()>.5?'#ffcc33':'#ff2222',t:'star'});showToast('🎆🎆 Pháo hoa đỏ vàng!')}
-// ===== MIỀN TÂY TƯƠNG TÁC =====
-function dropCoconut(e,el){e.stopPropagation();cocoDrop++;el.style.transform='translateY(90px) rotate(40deg)';el.style.transition='transform 1s';setTimeout(()=>{el.style.transform='';},1600);$('cocoCount').textContent='Đã uống: '+cocoDrink+' ly • Dừa rụng: '+cocoDrop+' trái';synthMelody(3);showToast('🥥 Dừa rụng rồi! Bấm “Uống dừa” nhé!')}
-function ripple(e){showToast('🌊 Sóng lan trên mặt nước Mekong...');synthMelody(7)}
-function drinkCoconut(){cocoDrink++;$('cocoCount').textContent='Đã uống: '+cocoDrink+' ly • Dừa rụng: '+cocoDrop+' trái';showToast('🥥 Ngon quá! Dừa xiêm Miền Tây mát lạnh!');renderProgress()}
-// ===== ẢNH LƯU NIỆM =====
-function snapshot(){
-  const p=PROVINCES.find(x=>x.id===currentId);const c=document.createElement('canvas');c.width=1080;c.height=720;const x=c.getContext('2d');
-  const g=x.createLinearGradient(0,0,1080,720);g.addColorStop(0,'#a40000');g.addColorStop(1,'#ffcc00');x.fillStyle=g;x.fillRect(0,0,1080,720);
-  x.fillStyle='#fff';x.font='900 64px Georgia';x.textAlign='center';x.fillText('VIỆT NAM 5D XUYÊN VIỆT',540,180);
-  x.font='48px serif';x.fillText('📍 '+p.name+' — '+p.vehicle,540,280);x.fillText('👗 '+p.outfit,540,360);x.fillText('👨🏻‍🦱 👩🏻 Trai Việt • Gái Việt',540,450);
-  x.font='28px sans-serif';x.fillText('Ảnh lưu niệm • '+(new Date()).toLocaleString('vi-VN'),540,560);
-  const a=document.createElement('a');a.download='xuyen-viet-'+currentId+'.png';a.href=c.toDataURL('image/png');a.click();showToast('📸 Đã tải ảnh lưu niệm '+p.name+'!')
-}
-// ===== NHẠC UPLOAD / KHÔI PHỤC / XUẤT =====
-function renderMusicList(){
-  $('musicList').innerHTML=PROVINCES.map(p=>{
-    const savedName=localStorage.getItem('vn5d_music_name_'+p.id);
-    return '<div class="musicRow"><span><b>'+p.name+'</b> — '+(savedName?('✅ Đã thay: '+savedName):('File gốc: '+p.file))+'</span><input type="file" accept="audio/mpeg,audio/mp3" onchange="uploadMusic(event,\''+p.id+'\')"></div>'}).join('');
-}
-function uploadMusic(e,id){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{localStorage.setItem('vn5d_music_'+id,r.result);localStorage.setItem('vn5d_music_name_'+id,f.name);renderMusicList();const p=PROVINCES.find(x=>x.id===id);showToast('✅ Đã thay nhạc '+p.name+'!');if(currentId===id)playProvinceMusic(p)};r.readAsDataURL(f)}
-function restoreMusic(){PROVINCES.forEach(p=>{localStorage.removeItem('vn5d_music_'+p.id);localStorage.removeItem('vn5d_music_name_'+p.id)});renderMusicList();showToast('🔄 Đã khôi phục nhạc gốc 15 tỉnh!')}
-function exportMusicList(){const txt=PROVINCES.map(p=>p.name+' | '+(localStorage.getItem('vn5d_music_name_'+p.id)||p.file)).join('\n');const a=document.createElement('a');a.download='danh-sach-nhac-xuyen-viet.txt';a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));a.click()}
-// ===== TAB + JOURNEY =====
-function showTab(name,btn){document.querySelectorAll('.panel').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.tabs button').forEach(e=>e.classList.remove('active'));$('panel-'+name).classList.add('active');if(btn)btn.classList.add('active')}
-let journeyTimer=null;
-function startJourney(){let i=0;clearInterval(journeyTimer);showToast('▶️ START JOURNEY! Bay lần lượt Bắc → Nam');journeyTimer=setInterval(()=>{if(i>=PROVINCES.length){clearInterval(journeyTimer);showToast('🎉 Hoàn thành hành trình Xuyên Việt!');return}flyTo(PROVINCES[i].id);i++},2600)}
-renderMusicList();renderProgress();flyTo('hoian');
+document.querySelectorAll('.portal').forEach(p=>{
+ p.onclick=()=>{document.getElementById('info').innerHTML='✈️ Đang bay tới '+p.innerText+'... 5D'; setTimeout(()=>{document.getElementById('info').innerHTML='✅ Đã tới '+p.innerText+'! 🛶';},1000)}
+})
 </script>
 </body>
 </html>
