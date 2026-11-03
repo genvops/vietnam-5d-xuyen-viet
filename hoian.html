@@ -16,11 +16,16 @@
   #minimap{width:168px;height:168px;border-radius:50%;border:3px solid #f5b301;box-shadow:0 0 0 3px rgba(0,0,0,.5),0 0 25px rgba(245,179,1,.5);background:#12241f;display:block}
   #minimapWrap .n{position:absolute;left:50%;top:-2px;transform:translateX(-50%);background:#111;color:#ffe27a;font-weight:800;font-size:13px;width:22px;height:22px;line-height:22px;border-radius:50%;border:1px solid #f5b301}
   #minimapWrap a{display:block;margin-top:6px;color:#ffe27a;font-size:12px}
-  #live{position:fixed;right:12px;top:118px;z-index:10;padding:12px;width:268px;font-size:13px;line-height:1.55}
-  #live h3{margin:0 0 4px;font-size:14px}
-  #live .red{color:#ff5a5a}
-  #feed div{border-top:1px solid rgba(255,255,255,.15);padding:4px 0}
-  #live small{color:#ccc}
+  #tiktok-live{position:fixed;left:12px;top:12px;z-index:10;padding:12px;width:280px;font-size:13px;line-height:1.55}
+  #tiktok-live h3{margin:0 0 4px;font-size:14px}
+  #tiktok-live .red{color:#ff5a5a}
+  #feed div{border-top:1px solid rgba(255,255,255,.15);padding:4px 0;overflow-wrap:anywhere}
+  #tiktok-live small{color:#ccc}
+  #tiktok-live input{width:100%;margin:4px 0;padding:9px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;font-size:13px;outline:none}
+  #tiktok-live input::placeholder{color:#ddd}
+  #vnGlow{position:fixed;inset:0;z-index:9;display:none;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(circle,rgba(255,215,0,.35),transparent 60%)}
+  #vnGlow.show{display:flex}
+  #vnGlow div{font-size:64px;font-weight:900;color:#ffe27a;text-shadow:0 0 30px #f5b301,0 0 60px #ff0}
   #actions{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;z-index:10;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:92vw}
   button{cursor:pointer;border:0;border-radius:999px;padding:11px 15px;font-size:13px;font-weight:700;color:#231303;background:linear-gradient(180deg,#ffe27a,#f5b301);box-shadow:0 4px 18px rgba(245,179,1,.4)}
   button.secondary{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);box-shadow:none}
@@ -34,11 +39,12 @@
   @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
   #loading p{margin:0;color:#ffe27a;font-weight:700}
   #loading span{font-size:13px;color:#ccc}
-  @media(max-width:760px){#live{display:none}#quest{width:calc(100vw - 24px)}#minimap{width:120px;height:120px}}
+  @media(max-width:760px){#tiktok-live{display:none}#quest{width:calc(100vw - 24px)}#minimap{width:120px;height:120px}}
 </style>
 <script>
   setTimeout(function(){ if(!window.__hoianReady){ var el=document.getElementById('loading'); if(el){ el.innerHTML='<div class="lamp">🏮</div><p>Chưa tải được cảnh 3D</p><span>Kiểm tra mạng rồi tải lại trang. Three.js được tải từ CDN jsdelivr.</span>'; } } }, 9000);
 </script>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -53,7 +59,7 @@
   <h2>◆ Releasing Lanterns on the River</h2>
   <div>Thả hoa đăng trên sông — Phố cổ Hội An, Chùa Cầu</div>
   <div>🌸 Hoa đăng đã thả: <b id="releasedCount">0</b> &nbsp;•&nbsp; 🏮 Đèn đã thắp: <b id="lampCount">0</b>/5</div>
-  <div>🚣 Xuồng trong đoàn: <b id="boatCount">6</b> &nbsp;•&nbsp; 🎮 Chế độ: <b id="modeLabel">Theo thuyền</b></div>
+  <div>🚣 Xuồng trong đoàn: <b id="boatCount">6</b> &nbsp;•&nbsp; 🎮 Chế độ: <b id="modeLabel">Xem như ảnh</b></div>
   <div style="color:#ffe9a8">TikTok: 1 🌹 = Bạn đi dạo &nbsp;•&nbsp; 5 🌹 = lên thuyền thả hoa đăng</div>
 </div>
 
@@ -62,21 +68,27 @@
   <a href="index.html">← Về bản đồ Việt Nam 5D</a>
 </div>
 
-<div id="live" class="glass">
-  <h3><span class="red">🔴 LIVE</span> TikTok <span id="viewers">• 642 đang xem</span></h3>
+<div id="tiktok-live" class="glass">
+  <h3><span class="red">🔴 LIVE</span> TikTok <span id="viewers">• 642 đang xem (mô phỏng)</span></h3>
   <div id="liveStatus">Mô phỏng • Chưa nối TikTok thật</div>
+  <input id="tiktokUser" placeholder="@TikTok của Sếp — VD: hoian.5d">
+  <input id="tiktokServer" value="http://localhost:3000" placeholder="Địa chỉ server: http://localhost:3000">
+  <button id="startLiveBtn" style="width:100%;margin:6px 0">▶ Bắt đầu Live (socket.io)</button>
   <div id="feed"><div>🌸 Chào mừng đến phố cổ Hội An về đêm!</div></div>
-  <button id="connectBtn" class="secondary small" style="width:100%;margin:6px 0">Kết nối TikTok thật (ws://localhost:8080)</button>
-  <div style="display:flex;gap:6px">
-    <button id="gift1Btn" class="small" style="flex:1">🌹 Tặng 1 bông (test)</button>
-    <button id="gift5Btn" class="small" style="flex:1">🌹 Tặng 5 bông (test)</button>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <button id="gift1Btn" class="small" style="flex:1">🌹 1 bông (test)</button>
+    <button id="gift5Btn" class="small" style="flex:1">🌹 5 bông (test)</button>
+    <button id="joinTestBtn" class="small secondary" style="flex:1">➕ Join (test)</button>
+    <button id="lionTestBtn" class="small secondary" style="flex:1">🦁 Sư tử (test)</button>
+    <button id="carTestBtn" class="small secondary" style="flex:1">🚗 Xe x2 (test)</button>
   </div>
-  <small>Bản Pages tĩnh không tự lấy quà TikTok thật được, cần server riêng. Chưa có server thì chạy mô phỏng để Sếp test luật 1 / 5 bông.</small>
+  <small>Pages tĩnh không chạy được server.js. Muốn live thật: chạy <b>node server.js</b> trên PC/VPS, rồi bấm Bắt đầu Live. Chưa có server thì đây là mô phỏng, số người xem là số giả để test.</small>
 </div>
+<div id="vnGlow"><div>VIỆT NAM ✦</div></div>
 
 <div id="actions">
   <button id="releaseBtn">🌸 Thả hoa đăng</button>
-  <button id="camBtn">🚣 Camera: Theo thuyền</button>
+  <button id="camBtn">📸 Camera: Xem như ảnh</button>
   <button id="joinBtn" class="secondary">➕ Tham gia đoàn</button>
   <button id="spinBtn" class="secondary">🔄 Xoay 360°: Tắt</button>
   <button id="musicBtn" class="secondary">♪ Nhạc: Tắt</button>
@@ -124,12 +136,12 @@ scene.fog = new THREE.FogExp2(0x1b2a4a, 0.0022);
   scene.environmentIntensity = 0.35;
 }
 const camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 1000);
-camera.position.set(0, 52, 118);
+camera.position.set(0, 88, 98);
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 0, -30);
+controls.target.set(0, 0, -40);
 controls.enableDamping = true; controls.dampingFactor = 0.06;
 controls.minDistance = 4; controls.maxDistance = 200; controls.maxPolarAngle = 1.52;
-controls.autoRotateSpeed = 0.9; controls.enabled = false;
+controls.autoRotateSpeed = 0.9; controls.enabled = true;
 
 scene.add(new THREE.AmbientLight(0x554433, 0.9));
 const moonLight = new THREE.DirectionalLight(0xffe9a8, 1.1);
@@ -558,7 +570,7 @@ const rower=makeGamePerson({ ao:0x4a5a2a, hat:0xd9b36a, scarf:false });
 rower.group.position.set(-4.2, 0.5, 0); rower.group.rotation.y=Math.PI/2;
 mainBoat.add(rower.group);
 const mainPole=makePole(); mainPole.position.set(-4.6, 1.2, 0.4); mainBoat.add(mainPole);
-mainBoat.position.set(0, 0.1, 80); scene.add(shadowed(mainBoat));
+mainBoat.position.set(0, 0.1, 20); scene.add(shadowed(mainBoat));
 
 // Bạn: nhân vật chính, ban đầu đứng vỉa hè phía đông
 const player=makeGamePerson({ ao:0x1a6a8a, pants:0x222222, pose:'stand', scarf:true });
@@ -640,11 +652,11 @@ for(let i=0;i<3;i++){
 }
 
 // ---------- Camera: Theo thuyền / Đi dạo theo Bạn / Xoay tự do ----------
-let camMode='follow';
+let camMode='orbit';
 const camModes=[
   { id:'follow', label:'Theo thuyền', btn:'🚣 Camera: Theo thuyền' },
   { id:'walk', label:'Đi dạo (theo Bạn)', btn:'🚶 Camera: Đi dạo (theo Bạn)' },
-  { id:'orbit', label:'Xoay tự do', btn:'🔄 Camera: Xoay tự do' },
+  { id:'orbit', label:'Xem như ảnh', btn:'📸 Camera: Xem như ảnh' },
 ];
 function setCamMode(mode){
   camMode=mode;
@@ -652,7 +664,7 @@ function setCamMode(mode){
   document.getElementById('modeLabel').textContent=m.label;
   document.getElementById('camBtn').textContent=m.btn;
   controls.enabled=(mode==='orbit');
-  if(mode==='orbit'){ controls.target.set(0,2,-20); }
+  if(mode==='orbit'){ controls.target.set(0,0,-40); }
   if(mode==='walk' && playerOnBoat){ disembarkPlayer(); }
 }
 document.getElementById('camBtn').addEventListener('click', ()=>{
@@ -716,19 +728,106 @@ function handleGift(count, sender){
     releaseLantern(count);
   }
 }
+// ---------- Đoàn xuồng TikTok: xuồng 3D thật, KHÔNG phải div portal ----------
+const doanNames=new Set(), doanBoats=[];
+let skyBoostUntilMs=0, boatBoostUntilMs=0;
+function normVN(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+function bubbleSprite(text){
+  const c=document.createElement('canvas'); c.width=512; c.height=96;
+  const g=c.getContext('2d'); g.fillStyle='rgba(0,0,0,0.65)'; g.beginPath(); g.roundRect(0,0,512,96,20); g.fill();
+  g.fillStyle='#ffe27a'; g.font='bold 32px Arial'; g.textAlign='center'; g.textBaseline='middle';
+  g.fillText(String(text).slice(0,30), 256, 48);
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({ map:t, transparent:true, depthWrite:false }));
+  s.scale.set(5, 0.94, 1); return s;
+}
+let chatBubble=null;
+function showChatBubble(user, comment){
+  if(chatBubble) mainBoat.remove(chatBubble);
+  chatBubble=bubbleSprite(user+': '+comment); chatBubble.position.set(0, 4.2, 0);
+  mainBoat.add(chatBubble);
+  setTimeout(()=>{ if(chatBubble){ mainBoat.remove(chatBubble); chatBubble=null; } }, 5000);
+}
+function addBoatToDoan(username){
+  const name=String(username||'Người xem');
+  if(doanNames.has(name)) return;
+  doanNames.add(name);
+  const kinds=['tay','ongba','genz']; const b=makeTouristBoat(kinds[doanBoats.length%3]);
+  const label=textSprite(name.slice(0,12)); label.position.y=2.6; b.add(label);
+  scene.add(b);
+  doanBoats.push({ group:b, offset:14+doanBoats.length*12 });
+  if(doanBoats.length>18){ const old=doanBoats.shift(); scene.remove(old.group); doanNames.delete(old.name); doanBoats.forEach((d,i)=>d.offset=14+i*12); }
+  doanBoats[doanBoats.length-1].name=name;
+  boatCount++; document.getElementById('boatCount').textContent=boatCount;
+  showToast('🚣 '+name+' vào đoàn!', 'Đoàn xuồng ba lá: '+boatCount+' xuồng');
+}
+// Pháo hoa 3D: chùm điểm sáng bay rồi tắt, chạy trong vòng lặp animate
+const fireworks=[];
+function spawnFireworkAt(pos, colorHex){
+  const n=42, posArr=new Float32Array(n*3), vel=[];
+  for(let i=0;i<n;i++){ posArr[i*3]=pos.x; posArr[i*3+1]=pos.y; posArr[i*3+2]=pos.z;
+    const a=Math.random()*Math.PI*2, r=2+Math.random()*4;
+    vel.push(new THREE.Vector3(Math.cos(a)*r, 3+Math.random()*5, Math.sin(a)*r)); }
+  const geo=new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(posArr,3));
+  const pts=new THREE.Points(geo, new THREE.PointsMaterial({ color:colorHex, size:0.45, transparent:true, opacity:1 }));
+  scene.add(pts); fireworks.push({ pts, vel, life:1.6 });
+}
+function spawnRoseFireworks(){
+  for(let i=0;i<5;i++){
+    const p=mainBoat.position.clone(); p.x+=(Math.random()-0.5)*14; p.y=6+Math.random()*6; p.z+=(Math.random()-0.5)*14;
+    spawnFireworkAt(p, 0xff5a8a);
+  }
+}
+function lionEffect(sender){
+  skyBoostUntilMs=Date.now()+10000;
+  const glow=document.getElementById('vnGlow'); glow.classList.add('show');
+  setTimeout(()=>glow.classList.remove('show'), 8000);
+  for(let i=0;i<8;i++){ const at=mainBoat.position.clone(); at.x+=(Math.random()-0.5)*4; at.z+=(Math.random()-0.5)*4; spawnReleasedLantern(at); }
+  addFeed('🦁 '+sender+' tặng Sư tử → Bản đồ VN vàng phát sáng, đèn lồng đỏ bay lên!');
+  showToast('🦁 Sư tử!', 'Bản đồ VN vàng phát sáng + đèn lồng đỏ bay lên');
+}
+function carBoost(sender){
+  boatBoostUntilMs=Date.now()+15000;
+  addFeed('🚗 '+sender+' tặng Xe → Xuồng chạy nhanh x2 trong 15s!');
+  showToast('🚗 Xe x2!', 'Xuồng ba lá chạy nhanh gấp đôi 15 giây');
+}
+function handleTikTokGift(user, gift, count){
+  const g=normVN(gift||'');
+  if(g.includes('rose') || g.includes('hoa hong') || g.includes('hoa')){
+    spawnRoseFireworks(); handleGift(Number(count||1), user);
+  } else if(g.includes('lion') || g.includes('su tu')){
+    lionEffect(user); spawnRoseFireworks();
+  } else if(g.includes('car') || g.includes('xe') || g.includes('oto')){
+    carBoost(user);
+  } else {
+    spawnRoseFireworks();
+    for(let i=0;i<5;i++){ const at=mainBoat.position.clone(); spawnReleasedLantern(at); }
+    addFeed('🎁 '+user+' tặng '+gift+' x'+(count||1)+' — đèn lồng đỏ bay lên!');
+    showToast('🎁 '+gift+'!', 'Đèn lồng đỏ bay lên sông Hoài');
+  }
+}
+function handleTikTokChat(user, comment){
+  addFeed('💬 '+user+': '+comment);
+  showChatBubble(user, comment);
+  const c=normVN(comment);
+  if(c.includes('xuong') || c.includes('len xuong')){
+    addBoatToDoan(user);
+    addFeed('👋 '+user+' nói "cho lên xuồng" → đã thêm vào đoàn!');
+  }
+}
+function handleTikTokJoin(user){
+  addFeed('👋 '+user+' vừa tham gia đoàn xuồng ba lá!');
+  addBoatToDoan(user);
+}
 document.getElementById('gift1Btn').addEventListener('click', ()=>handleGift(1,'Bạn (test)'));
 document.getElementById('gift5Btn').addEventListener('click', ()=>handleGift(5,'Bạn (test)'));
+document.getElementById('joinTestBtn').addEventListener('click', ()=>handleTikTokJoin('GenZ123 (test)'));
+document.getElementById('lionTestBtn').addEventListener('click', ()=>handleTikTokGift('Bạn (test)','Sư tử',1));
+document.getElementById('carTestBtn').addEventListener('click', ()=>handleTikTokGift('Bạn (test)','Xe',1));
 document.getElementById('releaseBtn').addEventListener('click', ()=>{
   releaseLantern(1); addFeed('🌸 Bạn tự thả 1 hoa đăng'); showToast('🌸 Thả hoa đăng!', 'Chúc mừng - Hội An');
 });
-document.getElementById('joinBtn').addEventListener('click', ()=>{
-  const kinds=['tay','ongba','genz']; const kind=kinds[boatCount%3];
-  const b=makeTouristBoat(kind); b.position.set(mainBoat.position.x+6, 0.1, mainBoat.position.z+16);
-  scene.add(b); boats.push(b);
-  touristBoats.push({ group:b, x:mainBoat.position.x+6, z:mainBoat.position.z+16, dir:1, speed:1.3 });
-  boatCount++; document.getElementById('boatCount').textContent=boatCount;
-  showToast('🚣 Đã thêm xuồng số '+boatCount+' vào đoàn!', 'Chào mừng bạn đến Hội An');
-});
+document.getElementById('joinBtn').addEventListener('click', ()=>handleTikTokJoin('Bạn'));
 document.getElementById('spinBtn').addEventListener('click', (e)=>{
   controls.autoRotate=!controls.autoRotate;
   e.currentTarget.textContent='🔄 Xoay 360°: '+(controls.autoRotate?'Bật':'Tắt');
@@ -752,8 +851,10 @@ document.getElementById('musicBtn').addEventListener('click', (e)=>{
     }; play();
   } else clearTimeout(musicTimer);
 });
-// TikTok thật qua ws, không được thì mô phỏng
-let liveMode='sim', simTimer=null, viewers=642;
+// TikTok thật qua socket.io -> server.js (port 3000), không được thì mô phỏng.
+// Ở chế độ mô phỏng, số người xem là số giả để test — KHÔNG phải viewer thật.
+// Ở chế độ thật, số người xem chỉ đổi khi server gửi 'tiktok-viewers'.
+let liveMode='sim', simTimer=null, viewers=642, tikSocket=null;
 function setLiveStatus(t){ document.getElementById('liveStatus').textContent=t; }
 function scheduleSimGift(){
   clearTimeout(simTimer);
@@ -766,33 +867,46 @@ function scheduleSimGift(){
   }, 14000+Math.random()*12000);
 }
 setInterval(()=>{
+  if(liveMode!=='sim') return;
   viewers=Math.max(500, viewers+Math.floor(Math.random()*21)-10);
-  document.getElementById('viewers').textContent='• '+viewers+' đang xem';
+  document.getElementById('viewers').textContent='• '+viewers+' đang xem (mô phỏng)';
 }, 3000);
 scheduleSimGift();
-document.getElementById('connectBtn').addEventListener('click', ()=>{
-  setLiveStatus('Đang nối ws://localhost:8080…');
-  let ws;
-  try{ ws=new WebSocket('ws://localhost:8080'); }catch(err){ setLiveStatus('Mô phỏng • Không nối được server TikTok'); return; }
-  const fail=setTimeout(()=>{ if(liveMode!=='real'){ try{ws.close();}catch(e){} setLiveStatus('Mô phỏng • Không có server TikTok (sau 2s)'); } }, 2000);
-  ws.onopen=()=>{ clearTimeout(fail); liveMode='real'; clearTimeout(simTimer); setLiveStatus('Đã nối TikTok thật • Quà thật đang chạy'); addFeed('✅ Đã nối TikTok thật'); };
-  ws.onmessage=(ev)=>{
-    try{
-      const data=typeof ev.data==='string'?JSON.parse(ev.data):ev.data;
-      const sender=data.user||data.nickname||data.username||'Người xem TikTok';
-      const count=Number(data.count||data.giftCount||data.roseCount||1);
-      const isGift=data.type && String(data.type).toLowerCase().includes('gift') || data.gift || data.rose || data.flower;
-      if(isGift) handleGift(count, sender);
-    }catch(e){
-      const s=String(ev.data);
-      const roses=(s.match(/🌹/g)||[]).length;
-      if(roses>0) handleGift(roses, 'Người xem TikTok');
-      else if(/hoa/i.test(s)){ const m=s.match(/(\d+)/); handleGift(m?Number(m[1]):1, 'Người xem TikTok'); }
-    }
-  };
-  ws.onclose=()=>{ if(liveMode==='real'){ liveMode='sim'; setLiveStatus('Mô phỏng • Mất nối TikTok'); scheduleSimGift(); } };
-  ws.onerror=()=>{ if(liveMode!=='real') setLiveStatus('Mô phỏng • Không nối được server TikTok'); };
-});
+function connectTikTokLive(){
+  if(typeof window.io==='undefined'){
+    setLiveStatus('Mô phỏng • Chưa tải được socket.io (CDN). Kiểm tra mạng rồi bấm lại.');
+    return;
+  }
+  const serverUrl=(document.getElementById('tiktokServer').value||'http://localhost:3000').trim();
+  const username=(document.getElementById('tiktokUser').value||'').trim().replace(/^@/,'');
+  setLiveStatus('Đang nối '+serverUrl+'…');
+  if(tikSocket) tikSocket.disconnect();
+  tikSocket=window.io(serverUrl);
+  tikSocket.on('connect', ()=>{
+    liveMode='real'; clearTimeout(simTimer);
+    setLiveStatus('Đã nối server TikTok • Đang chờ live thật');
+    addFeed('✅ Đã nối server TikTok');
+    if(username) tikSocket.emit('set-username', username);
+    document.getElementById('viewers').textContent='• đang live (chờ số thật từ server)';
+  });
+  tikSocket.on('live-status', msg=>setLiveStatus(msg));
+  tikSocket.on('tiktok-chat', (user, comment)=>handleTikTokChat(user, comment));
+  tikSocket.on('tiktok-join', (user)=>handleTikTokJoin(user));
+  tikSocket.on('tiktok-gift', (user, gift, count)=>handleTikTokGift(user, gift, count));
+  tikSocket.on('tiktok-viewers', (count)=>{
+    if(liveMode==='real') document.getElementById('viewers').textContent='• '+count+' đang xem';
+  });
+  tikSocket.on('tiktok-like', (user, count)=>{
+    if(liveMode==='real' && Number(count)%50===0) addFeed('❤️ '+user+' thả tim');
+  });
+  tikSocket.on('disconnect', ()=>{
+    if(liveMode==='real'){ liveMode='sim'; setLiveStatus('Mô phỏng • Mất nối server TikTok'); scheduleSimGift(); }
+  });
+  tikSocket.on('connect_error', ()=>{
+    if(liveMode!=='real') setLiveStatus('Mô phỏng • Không nối được '+serverUrl+' — chạy "node server.js" rồi bấm Bắt đầu Live lại.');
+  });
+}
+document.getElementById('startLiveBtn').addEventListener('click', connectTikTokLive);
 
 // ---------- Bấm đèn ----------
 const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
@@ -848,7 +962,7 @@ function drawMinimap(){
 // ---------- Vòng lặp game: mọi thứ đều cử động ----------
 const clock=new THREE.Clock();
 let elapsed=0, frame=0;
-let mainZ=80, mainDir=-1;
+let mainZ=20, mainDir=-1;
 const dummy=new THREE.Matrix4(), qTmp=new THREE.Quaternion(), eTmp=new THREE.Euler(), sTmp=new THREE.Vector3();
 function animate(){
   requestAnimationFrame(animate);
@@ -856,7 +970,8 @@ function animate(){
   const t=elapsed;
   water.material.uniforms.time.value+=dt;
   // Thuyền chính chạy dọc kênh về phía Chùa Cầu rồi quay lại
-  const speed=(camMode==='follow' && keys['KeyW']) ? 7 : (camMode==='follow' && keys['KeyS']) ? 1.2 : 3.4;
+  const boostMul=Date.now()<boatBoostUntilMs ? 2 : 1; // quà Xe: x2 trong 15s
+  const speed=((camMode==='follow' && keys['KeyW']) ? 7 : (camMode==='follow' && keys['KeyS']) ? 1.2 : 3.4)*boostMul;
   mainZ+=mainDir*speed*dt;
   if(mainZ<-120){ mainZ=-120; mainDir=1; }
   if(mainZ>125){ mainZ=125; mainDir=-1; }
@@ -874,9 +989,14 @@ function animate(){
     p.headGroup.rotation.x=Math.sin(t*0.9+i)*0.08;
     p.headGroup.rotation.y=Math.sin(t*0.5+i)*0.12;
   });
+  // Đoàn xuồng TikTok: bám sau thuyền chính, mỗi xuồng cách nhau 12m
+  for(const d of doanBoats){
+    d.group.position.set(mainBoat.position.x+6, 0.1+Math.sin(t*1.1+d.offset)*0.12, mainBoat.position.z+mainDir*-1*d.offset);
+    d.group.rotation.y=mainBoat.rotation.y;
+  }
   // Thuyền du lịch chạy dọc kênh
   for(const tb of touristBoats){
-    tb.z+=tb.dir*tb.speed*dt;
+    tb.z+=tb.dir*tb.speed*boostMul*dt;
     if(tb.z<-125){ tb.z=-125; tb.dir=1; }
     if(tb.z>125){ tb.z=125; tb.dir=-1; }
     tb.group.position.set(tb.x, 0.1+Math.sin(t+tb.z)*0.1, tb.z);
@@ -931,8 +1051,9 @@ function animate(){
     hanging.setMatrixAt(i, dummy);
   });
   hanging.instanceMatrix.needsUpdate=true;
-  // Đèn trời bay lên
-  for(let i=0;i<SKY;i++){ const st=skyState[i]; st.y+=st.sp*0.02; if(st.y>34){ st.y=3; st.x=-18+Math.random()*36; st.z=-130+Math.random()*260; }
+  // Đèn trời bay lên (quà Sư tử: bay nhanh x4 trong 10s)
+  const skyMul=Date.now()<skyBoostUntilMs ? 4 : 1;
+  for(let i=0;i<SKY;i++){ const st=skyState[i]; st.y+=st.sp*0.02*skyMul; if(st.y>34){ st.y=3; st.x=-18+Math.random()*36; st.z=-130+Math.random()*260; }
     dummy.makeScale(st.sc,st.sc,st.sc); dummy.setPosition(st.x,st.y,st.z); skyLanterns.setMatrixAt(i,dummy); }
   skyLanterns.instanceMatrix.needsUpdate=true;
   // Hoa đăng trôi về phía nam
@@ -947,6 +1068,17 @@ function animate(){
   for(let i=releasedLanterns.length-1;i>=0;i--){
     const rl=releasedLanterns[i]; rl.position.z+=1.1*dt; rl.position.y=0.4+Math.sin(t*1.5+i)*0.08; rl.rotation.y+=0.002;
     if(rl.position.z>155){ scene.remove(rl); releasedLanterns.splice(i,1); }
+  }
+  // Pháo hoa TikTok: điểm sáng bay lên rồi tắt
+  for(let i=fireworks.length-1;i>=0;i--){
+    const fw=fireworks[i]; fw.life-=dt;
+    const arr=fw.pts.geometry.attributes.position.array;
+    for(let j=0;j<fw.vel.length;j++){
+      arr[j*3]+=fw.vel[j].x*dt; arr[j*3+1]+=fw.vel[j].y*dt; arr[j*3+2]+=fw.vel[j].z*dt; fw.vel[j].y-=4*dt;
+    }
+    fw.pts.geometry.attributes.position.needsUpdate=true;
+    fw.pts.material.opacity=Math.max(fw.life/1.6, 0);
+    if(fw.life<=0){ scene.remove(fw.pts); fireworks.splice(i,1); }
   }
   if(clickGlow.material.opacity>0) clickGlow.material.opacity*=0.96;
   // Camera
