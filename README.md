@@ -23,3 +23,13 @@ Link live (sau khi bật Pages): https://genvops.github.io/vietnam-5d-xuyen-viet
 
 ## Live TikTok qua OBS
 Thêm Browser Source với link live trên, đặt 1080×1920 (dọc) hoặc 1920×1080 (ngang). Nhân vật là hình minh họa phong cách Việt, không dùng ảnh người thật không rõ nguồn.
+
+## Game Hội An + TikTok LIVE thật (hoian.html + server.js)
+GitHub Pages là web tĩnh, KHÔNG chạy được server TikTok. Muốn live thật, chạy riêng:
+```bash
+npm i
+TIKTOK_USERNAME=hoian.5d node server.js
+# mở http://localhost:3000  (game), bấm "Bắt đầu Live" ở khung góc trái trên
+```
+Không đặt username thì server vẫn chạy để test qua `/test/join?user=GenZ123`, `/test/chat`, `/test/gift`, nhưng chưa nối TikTok thật.
+Luật trong game: comment hiện bong bóng trên thuyền chính; comment "cho lên xuồng" hoặc có người JOIN live thì thêm 1 xuồng 3D vào đoàn; Hoa hồng = pháo hoa hồng + 1 bông đi dạo / 5 bông lên thuyền thả hoa đăng; Sư tử = bản đồ VN vàng phát sáng + đèn lồng đỏ bay lên; Xe = xuồng chạy nhanh x2 trong 15s. Chưa có server thì game chạy mô phỏng, số người xem lúc đó là số giả để test, không phải viewer thật.
