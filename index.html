@@ -5,34 +5,157 @@
 <meta name="viewport" content="width=device-width">
 <title>VIỆT NAM 5D</title>
 <style>
-body{margin:0;background:#0a0a1a;color:white;font-family:Arial;overflow:hidden}
-#map{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:380px;height:650px;background:linear-gradient(gold,yellow);clip-path:path("M150 0 C200 0 250 50 250 150 C250 250 200 300 180 400 C160 500 150 650 100 650 C50 650 0 500 20 400 C40 300 100 250 100 150 C100 50 100 0 150 0 Z");box-shadow:0 0 40px gold;display:flex;align-items:center;justify-content:center;font-size:30px;color:red;font-weight:bold}
-.portal{position:absolute;width:110px;height:110px;border-radius:50%;border:3px solid gold;background:rgba(255,215,0,0.2);display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;cursor:pointer;animation:float 3s infinite}
-.portal:hover{transform:scale(1.2);background:gold;color:black}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
-.char{position:absolute;font-size:50px;animation:float 2s infinite}
-#info{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);padding:10px 20px;border-radius:20px;border:2px solid gold}
+/* 1. BACKGROUND: ảnh sông nước tối + lớp tối phủ để chữ và map nổi, sao vàng bằng CSS */
+body{margin:0;color:white;font-family:Arial;overflow:hidden;
+ background:#0a0a1a url("https://images.unsplash.com/photo-1528127269322-539801943592") center/cover no-repeat fixed}
+body::before{content:"";position:fixed;inset:0;background:linear-gradient(rgba(5,5,25,.72),rgba(5,5,25,.55));z-index:0;pointer-events:none}
+.star{position:fixed;width:4px;height:4px;background:#ffe27a;border-radius:50%;box-shadow:0 0 8px gold;animation:twinkle 2s infinite;z-index:1}
+@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:1}}
+/* 2. MAP VN VÀNG GIỮA TRANG, phát sáng */
+#vietnam-map{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:500px;height:700px;max-width:82vw;max-height:76vh;
+ background:linear-gradient(gold,#ffe27a);clip-path:path("M150 0 C200 0 250 50 250 150 C250 250 200 300 180 400 C160 500 150 650 100 650 C50 650 0 500 20 400 C40 300 100 250 100 150 C100 50 100 0 150 0 Z");
+ box-shadow:0 0 60px gold;filter:drop-shadow(0 0 30px gold);display:flex;align-items:center;justify-content:center;
+ font-size:34px;color:#a40000;font-weight:bold;text-align:center;animation:glow 3s infinite;z-index:2}
+@keyframes glow{0%,100%{box-shadow:0 0 40px gold}50%{box-shadow:0 0 80px #ffe27a}}
+/* 3. 15 CỔNG TRÒN VÀNG, pulse */
+.portal{position:absolute;width:120px;height:120px;border-radius:50%;border:3px solid gold;
+ background:radial-gradient(circle,rgba(255,215,0,.85),rgba(255,215,0,.15) 70%,transparent);
+ box-shadow:0 0 20px gold;display:flex;align-items:center;justify-content:center;text-align:center;
+ font-size:13px;font-weight:bold;color:white;cursor:pointer;animation:pulse 2s infinite;z-index:5}
+.portal:hover{transform:scale(1.15);background:gold;color:black}
+@keyframes pulse{0%,100%{box-shadow:0 0 15px gold}50%{box-shadow:0 0 35px #ffe27a}}
+/* 4. NHÂN VẬT CHÍNH: cặp trai gái Việt ở dưới giữa, trên xuồng ba lá gỗ */
+#couple{position:fixed;left:50%;bottom:78px;transform:translateX(-50%);text-align:center;z-index:6}
+#couple .people{font-size:52px;animation:float 2.5s infinite}
+#couple .labels{font-size:13px;background:rgba(0,0,0,.7);border:1px solid gold;border-radius:999px;padding:5px 12px;display:inline-block}
+#boat{width:240px;height:34px;margin:2px auto 0;background:linear-gradient(#8b5a2b,#5a3a1a);border:3px solid #3a2410;
+ border-radius:0 0 120px 120px;box-shadow:0 6px 14px rgba(0,0,0,.6);position:relative}
+#boat::before{content:"🛶";position:absolute;left:50%;top:-26px;transform:translateX(-50%);font-size:26px}
+.lantern{position:fixed;font-size:34px;animation:flyUp 9s linear infinite;z-index:3}
+@keyframes flyUp{from{transform:translateY(20vh)}to{transform:translateY(-110vh)}}
+.lotus{position:fixed;bottom:18px;font-size:30px;animation:float 3s infinite;z-index:3}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+#info{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);padding:10px 20px;border-radius:20px;border:2px solid gold;z-index:20;text-align:center;max-width:94vw;font-size:15px}
+#backBtn{display:none;position:fixed;top:14px;left:14px;z-index:30;background:gold;color:black;border:0;border-radius:999px;padding:12px 18px;font-weight:bold;font-size:16px;cursor:pointer}
+/* Cảnh tỉnh khi click: phủ toàn màn hình, map + cổng ẩn đi nên thấy cảnh ngay, không đứng im ở map chính */
+.scene{display:none;position:fixed;inset:0;z-index:10;overflow:auto;text-align:center;padding:70px 16px 110px}
+.scene h2{font-size:34px;margin:8px 0}
+.scene .big{font-size:96px;animation:float 2.5s infinite}
+.scene .vehicle{font-size:72px;margin:10px 0}
+.scene p{font-size:19px;background:rgba(0,0,0,.6);display:inline-block;padding:12px 18px;border-radius:16px;border:2px solid gold}
+@media(max-width:640px){#vietnam-map{width:320px;height:460px;font-size:24px}.portal{width:84px;height:84px;font-size:11px}#couple .people{font-size:40px}#boat{width:180px}}
 </style>
 </head>
 <body>
-<div id="map">VIỆT NAM<br>🇻🇳</div>
-<div class="portal" style="left:10%;top:10%">Hà Nội<br>Xích Lô</div>
-<div class="portal" style="left:20%;top:5%">Hạ Long<br>Thuyền Rồng</div>
-<div class="portal" style="left:5%;top:40%">Sapa<br>Cáp Treo</div>
-<div class="portal" style="left:15%;top:60%">Ninh Bình<br>Đò Nan</div>
-<div class="portal" style="left:5%;top:80%">Huế<br>Thuyền Rồng</div>
-<div class="portal" style="left:35%;top:85%">Hội An<br>Thuyền Thúng</div>
-<div class="portal" style="left:60%;top:85%">Đà Nẵng<br>Cáp Treo</div>
-<div class="portal" style="left:80%;top:70%">Miền Tây<br>Xuồng Ba Lá</div>
-<div class="portal" style="left:85%;top:40%">Nha Trang<br>Cano</div>
-<div class="portal" style="left:80%;top:10%">Hà Giang<br>Xe Máy</div>
-<div class="char" style="left:48%;top:45%">👦</div>
-<div class="char" style="left:52%;top:48%;animation-delay:0.5s">👧</div>
+<span class="star" style="left:12%;top:10%"></span><span class="star" style="left:82%;top:18%"></span><span class="star" style="left:30%;top:6%"></span><span class="star" style="left:65%;top:8%;animation-delay:.6s"></span><span class="star" style="left:90%;top:55%"></span><span class="star" style="left:6%;top:60%"></span>
+<span class="lantern" style="left:8%;animation-delay:0s">🏮</span><span class="lantern" style="left:88%;animation-delay:3s">🏮</span><span class="lantern" style="left:45%;animation-delay:6s">🏮</span>
+<span class="lotus" style="left:6%">🪷</span><span class="lotus" style="right:6%">🪷</span>
+
+<div id="vietnam-map">VIỆT NAM<br>🇻🇳<br><span style="font-size:16px">15 TỈNH XUYÊN VIỆT</span></div>
+
+<!-- 15 cổng: Hanoi trên, HaLong phải, Mien Tay trái dưới, các tỉnh còn lại quanh map -->
+<div class="portal" data-key="HaNoi" style="left:16%;top:6%">Hà Nội<br>🛺 Xích Lô</div>
+<div class="portal" data-key="HaGiang" style="left:56%;top:2%">Hà Giang<br>🏍️ Xe Máy</div>
+<div class="portal" data-key="HaLong" style="left:78%;top:10%">Hạ Long<br>🐉 Thuyền Rồng</div>
+<div class="portal" data-key="Sapa" style="left:6%;top:24%">Sapa<br>🚡 Cáp Treo</div>
+<div class="portal" data-key="NinhBinh" style="left:20%;top:34%">Ninh Bình<br>🛶 Đò Nan</div>
+<div class="portal" data-key="PhongNha" style="left:72%;top:32%">Phong Nha<br>🛶 Kayak</div>
+<div class="portal" data-key="Hue" style="left:80%;top:45%">Huế<br>🛺 Thuyền Rồng</div>
+<div class="portal" data-key="DaNang" style="left:82%;top:56%">Đà Nẵng<br>🚡 Cầu Vàng</div>
+<div class="portal" data-key="HoiAn" style="left:62%;top:60%">Hội An<br>🏮 Thuyền Thúng</div>
+<div class="portal" data-key="NhaTrang" style="left:82%;top:68%">Nha Trang<br>🚤 Cano</div>
+<div class="portal" data-key="DaLat" style="left:66%;top:74%">Đà Lạt<br>🚙 Xe Jeep</div>
+<div class="portal" data-key="SaiGon" style="left:44%;top:88%">Sài Gòn<br>🚌 Bus 2 Tầng</div>
+<div class="portal" data-key="MienTay" style="left:8%;top:76%">Miền Tây<br>🛶 Xuồng Ba Lá</div>
+<div class="portal" data-key="PhuQuoc" style="left:14%;top:90%">Phú Quốc<br>🚤 Cano Đảo</div>
+<div class="portal" data-key="CaMau" style="left:82%;top:88%">Cà Mau<br>🚤 Vỏ Lãi</div>
+
+<!-- Nhân vật chính: trai gái Việt áo bà ba nâu + khăn rằn, tóc đen, ngồi xuồng ba lá gỗ -->
+<div id="couple">
+  <div class="people">👦 👧</div>
+  <div class="labels">👦 áo bà ba nâu • 👧 khăn rằn • tóc đen • Trai Việt - Gái Việt</div>
+  <div id="boat"></div>
+  <div style="font-size:13px;margin-top:4px">🛶 Xuồng ba lá gỗ màu nâu</div>
+</div>
+
+<button id="backBtn" onclick="backToMap()">⬅️ Quay về bản đồ VN</button>
+
+<!-- 15 cảnh riêng, mặc định ẩn -->
+<div class="scene" id="scene-HaNoi" style="background:linear-gradient(#ff9d00,#a40000)"><h2>🏯 HÀ NỘI</h2><div class="big">🏯🌸</div><div class="vehicle">🛺 👦 👧</div><p>Hà Nội - Xích lô quanh Hồ Gươm.</p></div>
+<div class="scene" id="scene-HaLong" style="background:linear-gradient(#00a8ff,#003a6b)"><h2>🐉 HẠ LONG</h2><div class="big">⛰️🌊⛵</div><div class="vehicle">🐉 👦 👧</div><p>Hạ Long - Thuyền rồng trên vịnh.</p></div>
+<div class="scene" id="scene-Sapa" style="background:linear-gradient(#7ec8e3,#2b5a3a)"><h2>🏔️ SAPA</h2><div class="big">🏔️🌾🚡</div><div class="vehicle">🚡 👦 👧</div><p>Sapa - Cáp treo Fansipan, ruộng bậc thang.</p></div>
+<div class="scene" id="scene-NinhBinh" style="background:linear-gradient(#7ec8e3,#3a6b2b)"><h2>🛶 NINH BÌNH</h2><div class="big">⛰️🌊🪷</div><div class="vehicle">🛶 👦 👧</div><p>Ninh Bình - Đò nan Tràng An.</p></div>
+<div class="scene" id="scene-HaGiang" style="background:linear-gradient(#8b5a2b,#3a2b1a)"><h2>🏍️ HÀ GIANG</h2><div class="big">🏔️🌸🛣️</div><div class="vehicle">🏍️ 👦 👧</div><p>Hà Giang - Xe máy đèo Mã Pí Lèng.</p></div>
+<div class="scene" id="scene-PhongNha" style="background:linear-gradient(#1a3a2a,#0a1a12)"><h2>🦇 PHONG NHA</h2><div class="big">🕳️🌊🌿</div><div class="vehicle">🛶 👦 👧</div><p>Phong Nha - Kayak trong động.</p></div>
+<div class="scene" id="scene-Hue" style="background:linear-gradient(#9b59b6,#4a235a)"><h2>🏯 HUẾ</h2><div class="big">🏯🌊🎶</div><div class="vehicle">🛺 👦 👧</div><p>Huế - Thuyền rồng sông Hương.</p></div>
+<div class="scene" id="scene-DaNang" style="background:linear-gradient(#00a8ff,#ffcc00)"><h2>🌉 ĐÀ NẴNG</h2><div class="big">🌉🏖️🚡</div><div class="vehicle">🚡 👦 👧</div><p>Đà Nẵng - Cáp treo Cầu Vàng.</p></div>
+<div class="scene" id="scene-HoiAn" style="background:linear-gradient(#ff9d00,#7a0000)"><h2>🏮 HỘI AN</h2><div class="big">🏮🏮🌊</div><div class="vehicle">🛶 👦 👧</div><p>Hội An - Thuyền đèn lồng sông Hoài.</p></div>
+<div class="scene" id="scene-NhaTrang" style="background:linear-gradient(#00c8ff,#003a6b)"><h2>🚤 NHA TRANG</h2><div class="big">🏖️🌊☀️</div><div class="vehicle">🚤 👦 👧</div><p>Nha Trang - Cano ra đảo.</p></div>
+<div class="scene" id="scene-DaLat" style="background:linear-gradient(#a8d8ff,#5a7a3a)"><h2>🌸 ĐÀ LẠT</h2><div class="big">🌲🌸🌫️</div><div class="vehicle">🚙 👦 👧</div><p>Đà Lạt - Xe jeep đồi thông.</p></div>
+<div class="scene" id="scene-SaiGon" style="background:linear-gradient(#ff6b6b,#7a0000)"><h2>🚌 SÀI GÒN</h2><div class="big">🏙️🛍️🌃</div><div class="vehicle">🚌 👦 👧</div><p>Sài Gòn - Bus 2 tầng / metro.</p></div>
+<div class="scene" id="scene-MienTay"><h2>🌴 MIỀN TÂY</h2><div class="big">🌴🥥🌊🌴</div><div class="vehicle">🛶 👦 👧</div><p>Đang ở Miền Tây - Xuồng ba lá quanh rặng dừa, chợ nổi, sông Mekong, dừa xiêm.</p></div>
+<div class="scene" id="scene-PhuQuoc" style="background:linear-gradient(#00e0c8,#003a6b)"><h2>🏝️ PHÚ QUỐC</h2><div class="big">🏝️🌊☀️</div><div class="vehicle">🚤 👦 👧</div><p>Phú Quốc - Cano đảo, bãi Sao.</p></div>
+<div class="scene" id="scene-CaMau" style="background:linear-gradient(#3a6b2b,#1a3a1a)"><h2>🚤 CÀ MAU</h2><div class="big">🌿🌊🧭</div><div class="vehicle">🚤 👦 👧</div><p>Cà Mau - Vỏ lãi ra Đất Mũi.</p></div>
+
 <div id="info">🛶 Đang đi: Xuồng Ba Lá Miền Tây quanh rặng dừa - Click cổng để bay!</div>
 <script>
-document.querySelectorAll('.portal').forEach(p=>{
- p.onclick=()=>{document.getElementById('info').innerHTML='✈️ Đang bay tới '+p.innerText+'... 5D'; setTimeout(()=>{document.getElementById('info').innerHTML='✅ Đã tới '+p.innerText+'! 🛶';},1000)}
-})
+// maps đủ 15 tỉnh. Riêng Miền Tây dùng ảnh Sếp cho làm nền cảnh; các tỉnh khác dùng nền minh họa để không vỡ ảnh, muốn thay ảnh thật chỉ cần đổi bg thành url ảnh tỉnh đó.
+var maps = {
+  "HaNoi": {name:"Hà Nội", boat:"🛺", vehicle:"xích lô", desc:"Hà Nội - Xích lô quanh Hồ Gươm", music:"hanoi.mp3", bg:"linear-gradient(#ff9d00,#a40000)"},
+  "HaLong": {name:"Hạ Long", boat:"🐉", vehicle:"thuyền rồng", desc:"Hạ Long - Thuyền rồng", music:"halong.mp3", bg:"linear-gradient(#00a8ff,#003a6b)"},
+  "Sapa": {name:"Sapa", boat:"🚡", vehicle:"cáp treo Fansipan", desc:"Sapa - Cáp treo Fansipan", music:"sapa.mp3", bg:"linear-gradient(#7ec8e3,#2b5a3a)"},
+  "NinhBinh": {name:"Ninh Bình", boat:"🛶", vehicle:"đò nan", desc:"Ninh Bình - Đò nan Tràng An", music:"ninhbinh.mp3", bg:"linear-gradient(#7ec8e3,#3a6b2b)"},
+  "HaGiang": {name:"Hà Giang", boat:"🏍️", vehicle:"xe máy", desc:"Hà Giang - Xe máy qua đèo Mã Pí Lèng", music:"hagiang.mp3", bg:"linear-gradient(#8b5a2b,#3a2b1a)"},
+  "PhongNha": {name:"Phong Nha", boat:"🛶", vehicle:"kayak", desc:"Phong Nha - Kayak trong động", music:"phongnha.mp3", bg:"linear-gradient(#1a3a2a,#0a1a12)"},
+  "Hue": {name:"Huế", boat:"🛺", vehicle:"xích lô tím / thuyền rồng sông Hương", desc:"Huế - Thuyền rồng sông Hương", music:"hue.mp3", bg:"linear-gradient(#9b59b6,#4a235a)"},
+  "DaNang": {name:"Đà Nẵng", boat:"🚡", vehicle:"cáp treo Bà Nà Hills (Cầu Vàng)", desc:"Đà Nẵng - Cáp treo Cầu Vàng", music:"danang.mp3", bg:"linear-gradient(#00a8ff,#ffcc00)"},
+  "HoiAn": {name:"Hội An", boat:"🛶", vehicle:"thuyền thúng / thuyền đèn lồng", desc:"Hội An - Thuyền đèn lồng sông Hoài", music:"hoian.mp3", bg:"linear-gradient(#ff9d00,#7a0000)"},
+  "NhaTrang": {name:"Nha Trang", boat:"🚤", vehicle:"cano", desc:"Nha Trang - Cano ra đảo", music:"nhatrang.mp3", bg:"linear-gradient(#00c8ff,#003a6b)"},
+  "DaLat": {name:"Đà Lạt", boat:"🚙", vehicle:"xe jeep", desc:"Đà Lạt - Xe jeep đồi thông", music:"dalat.mp3", bg:"linear-gradient(#a8d8ff,#5a7a3a)"},
+  "SaiGon": {name:"Sài Gòn", boat:"🚌", vehicle:"bus 2 tầng / metro", desc:"Sài Gòn - Bus 2 tầng", music:"saigon.mp3", bg:"linear-gradient(#ff6b6b,#7a0000)"},
+  "MienTay": {name:"Miền Tây", boat:"🛶", vehicle:"xuồng ba lá", desc:"Đang ở Miền Tây - Xuồng ba lá quanh rặng dừa", music:"mientay.mp3", bg:""},
+  "PhuQuoc": {name:"Phú Quốc", boat:"🚤", vehicle:"cano / xe jeep đảo", desc:"Phú Quốc - Cano đảo", music:"phuquoc.mp3", bg:"linear-gradient(#00e0c8,#003a6b)"},
+  "CaMau": {name:"Cà Mau", boat:"🚤", vehicle:"vỏ lãi / xuồng máy", desc:"Cà Mau - Vỏ lãi ra Đất Mũi", music:"camau.mp3", bg:"linear-gradient(#3a6b2b,#1a3a1a)"}
+};
+function playSound(key){
+  try { var a = new Audio("public/music/" + maps[key].music); var p = a.play(); if (p) p.catch(function(){ synthSound(key); }); a.addEventListener("error", function(){ synthSound(key); }); }
+  catch(e) { synthSound(key); }
+}
+function synthSound(key){
+  try { var ctx = new (window.AudioContext || window.webkitAudioContext)(); var keys = Object.keys(maps), base = 440 + keys.indexOf(key) * 30;
+    [0,1,2].forEach(function(i){ var o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = base + i * 110; g.gain.value = 0.08; o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime + 0.4 + i * 0.2); }); } catch(e) {}
+}
+function openScene(key){
+  var m = maps[key]; if (!m) return;
+  document.getElementById("info").innerHTML = "✈️ Đang bay tới " + m.name + " - " + m.vehicle + "...";
+  document.body.animate([{filter:"brightness(2)"},{filter:"brightness(1)"}], {duration:1000});
+  setTimeout(function(){
+    document.getElementById("vietnam-map").style.display = "none";
+    document.querySelectorAll(".portal").forEach(function(p){ p.style.display = "none"; });
+    document.getElementById("couple").style.display = "none";
+    document.querySelectorAll(".scene").forEach(function(s){ s.style.display = "none"; });
+    var scene = document.getElementById("scene-" + key); scene.style.display = "block";
+    if (key === "MienTay") {
+      // Miền Tây 100% như mô tả: nền ảnh sông nước Sếp cho + rặng dừa, xuồng ba lá ở ngay trong cảnh
+      scene.style.background = 'linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.35)), url("https://images.unsplash.com/photo-1528127269322-539801943592") center/cover';
+    } else if (m.bg) { scene.style.background = m.bg; }
+    document.getElementById("info").innerText = "✅ Đã tới " + m.desc + "! " + m.boat + " " + m.vehicle;
+    document.getElementById("backBtn").style.display = "block";
+    localStorage.setItem("currentMap", key);
+    playSound(key);
+  }, 600);
+}
+function backToMap(){
+  document.querySelectorAll(".scene").forEach(function(s){ s.style.display = "none"; });
+  document.getElementById("vietnam-map").style.display = "flex";
+  document.querySelectorAll(".portal").forEach(function(p){ p.style.display = "flex"; });
+  document.getElementById("couple").style.display = "block";
+  document.getElementById("backBtn").style.display = "none";
+  document.getElementById("info").innerHTML = "🗺️ Đã về bản đồ VN - Click cổng để bay tiếp!";
+}
+document.querySelectorAll(".portal").forEach(function(p){ p.onclick = function(){ openScene(p.dataset.key); }; });
+var last = localStorage.getItem("currentMap");
+if (last && maps[last]) { document.getElementById("info").innerHTML = "🛶 Đang đi: Xuồng Ba Lá Miền Tây quanh rặng dừa - Click cổng để bay! (Lần trước bạn ở: " + maps[last].name + ")"; }
 </script>
 </body>
 </html>
